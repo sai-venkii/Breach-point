@@ -24,4 +24,4 @@ const teamModels = new Schema(
     }
 )
 const Teams = mongoose.model("Teams",teamModels)
-export default Teams;
+module.exports=Teams

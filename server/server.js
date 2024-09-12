@@ -9,8 +9,6 @@ require('dotenv').config();
 
 require('./connection')();
 
-app.use(authMiddleware);
-
 const PORT = process.env.PORT || 5500
 app.use('/auth',authRoute);
 app.listen(PORT,()=>{

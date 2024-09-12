@@ -4,7 +4,7 @@ const Teams = require('../Models/Teams');
 const bcrypt = require('bcrypt');
 router.use(express.json());
 
-router.post("/", async (req, res) => {
+router.post("/register", async (req, res) => {
     const { teamName, password, email } = req.body;
 
     try {
@@ -37,7 +37,7 @@ router.post("/login", async (req, res) => {
         }
         const match = await bcrypt.compare(password, team.password);
         if (match) {
-            res.redirect('/Home');
+            res.redirect('/');
         } else {
             res.status(401).json({ message: "Invalid credentials" });
         }
