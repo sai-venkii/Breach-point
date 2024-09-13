@@ -16,7 +16,7 @@ router.get("/:id",authMiddleware,async (req,res)=>{
     }else{
         try {
             const problems = await Problems.getSingleProblem(id);
-            res.send(problems);
+            res.send(problems[0]);
         } catch (err) {
             console.log(err);
             res.status(500).json({ message: `Error fetching problem ${id}`});

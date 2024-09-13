@@ -93,7 +93,7 @@ problemSchema.statics.getHint = async function(id){
 
 problemSchema.statics.getSingleProblem = async function (id) {
     try {
-        return this.find({id:id},'-solvedTeams -_id -hints -__v')
+        return this.find({id:id},'-solvedTeams -_id -hints -__v').limit(1);
     } catch (err) {
     }
 }
