@@ -5,6 +5,19 @@ import { AiOutlineDown, AiOutlineUp } from 'react-icons/ai';
 import axios from 'axios';
 
 export default function Home(props) {
+  const [OSINTO,setOSINTOpen] = useState(true)
+  const [FO,setFOpen] = useState(true)
+  const [CO,setCOOpen] = useState(true)
+
+  const toggleOSINTChallenges = () =>{
+    setOSINTOpen(!OSINTO)
+  }
+  const toggleCRYPTOChallenges = () =>{
+    setCOOpen(!CO)
+  }
+  const toggleFORENSICSChallenges = () =>{
+    setFOpen(!FO)
+  }
   const [data,setData] = useState(null)
   useEffect(() => {
     const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0ZWFtIjoidGVzdDIiLCJlbWFpbCI6IjIycGMwNEBwc2d0ZWNoLmFjLmluIiwiaWF0IjoxNzI2MjAxMzM1LCJleHAiOjE3MjYyMTkzMzV9.CjsQfm31EV1V59cE6AGWjcysrcVZhbjLF5asmK3WDf8';
@@ -66,51 +79,51 @@ const [selectedChallenge, setSelectedChallenge] = useState(null);
         <div className="relative bg-black px-6 py-4 w-full max-w-xs">
           <p className="text-hacker-green text-2xl flex font-orbitron items-center no-select">
             OSINT
-            <span style={{ cursor: 'pointer', marginLeft: '10px' }}>
-              <AiOutlineDown />
+            <span onClick={toggleOSINTChallenges}style={{ cursor: 'pointer', marginLeft: '10px' }}>
+              {OSINTO ?  <AiOutlineDown /> : <AiOutlineUp/>}
             </span>
           </p>
-            <div className="challenges-content mt-4">
+           {OSINTO &&  <div className="challenges-content mt-4">
             <ul className="list-disc pl-6">
             {data && data.map((item,index)=>(item.category=="OSINT" && 
               <li key={item.id} className='font-orbitron cursor-pointer' onClick={() => openChallengeDetails({ name : item.name,category : item.category ,points: item.points})}>{item.name}</li>
           ))}
             </ul>
-          </div>
+          </div> }
         </div>
 
         {/* Crypto Challenges */}
         <div className="relative bg-black px-6 py-4 w-full max-w-xs">
           <p className="text-hacker-green text-2xl flex font-orbitron items-center no-select">
             Crypto
-            <span style={{ cursor: 'pointer', marginLeft: '10px' }}>
-              <AiOutlineDown />
+            <span onClick={toggleCRYPTOChallenges} style={{ cursor: 'pointer', marginLeft: '10px' }}>
+              {CO ? <AiOutlineDown /> : <AiOutlineUp/>}
             </span>
           </p>
-          <div className="challenges-content mt-4">
+          {CO && <div className="challenges-content mt-4">
             <ul className="list-disc pl-6">
             {data && data.map((item,index)=>(item.category=="Crypto"&&
               <li key={item.id} className='font-orbitron cursor-pointer' onClick={() => openChallengeDetails({ name : item.name,category : item.category ,points: item.points})}>{item.name}</li>
           ))}
             </ul>
-          </div>
+          </div>}
         </div>
 
         {/* Forensics Challenges */}
         <div className="relative bg-black px-6 py-4 w-full max-w-xs">
           <p className="text-hacker-green text-2xl flex font-orbitron items-center no-select">
             Forensics
-            <span style={{ cursor: 'pointer', marginLeft: '10px' }}>
-              <AiOutlineDown />
+            <span onClick={toggleFORENSICSChallenges} style={{ cursor: 'pointer', marginLeft: '10px' }}>
+              {FO ? <AiOutlineDown /> : <AiOutlineUp/>}
             </span>
           </p>
-          <div className="challenges-content mt-4">
+          {FO && <div className="challenges-content mt-4">
             <ul className="list-disc pl-6">
           {data && data.map((item,index)=>(item.category=="Forensics" && 
               <li key={item.id} className='font-orbitron cursor-pointer' onClick={() => openChallengeDetails({ name : item.name,category : item.category ,points: item.points})}>{item.name}</li>
           ))}
            </ul>
-          </div>
+          </div>}
         </div>
       </div>
 
