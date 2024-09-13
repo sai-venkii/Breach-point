@@ -79,16 +79,25 @@ router.get("/hint/:id", authMiddleware, async (req, res) => {
 router.post("/submit/:id", authMiddleware, async (req, res) => {
   try {
     const id = req.params.id;
-    const {user_flag} = req.body;
+    const user_flag = req.body.flag;
     if (!id) {
-      res.send(201).json({
+      res.status(201).json({
         message: "Incorrect Parameters",
       });
     }
-    const flag = await Problems.getSingleProblem(id, false)[0];
-    console.log(flag);
+    const flag = await Problems.getSingleProblem(id, false);
+    // console.log(flag,user_flag);
+    if (flag[0].flag === user_flag) {
+        res.status(200).send("Solved");
+    } else {
+        res.status(200).send("Incorrect Flag");
+    }
+    
   } catch (err) {
-
+    console.log(err);
+    res.status(500).json({
+      message: "Couldn't fetch flag",
+    });
   }
 });
 

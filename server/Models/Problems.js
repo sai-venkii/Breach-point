@@ -91,9 +91,9 @@ problemSchema.statics.getHint = async function (id) {
 problemSchema.statics.getSingleProblem = async function (id, hide_flag = true) {
   try {
     if (hide_flag) {
-      return this.find({ id: id }, "-solvedTeams -_id -hints -__v -flag").limit(1);
+      return await this.find({ id: id }, "-solvedTeams -_id -hints -__v -flag").limit(1);
     } else {
-      return this.find({ id: id }, "flag -_id").limit(1);
+      return await this.find({ id: id }, "flag -_id").limit(1);
     }
   } catch (err) {}
 };
