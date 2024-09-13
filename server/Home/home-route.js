@@ -3,13 +3,26 @@ require("dotenv").config()
 const authMiddleware=require('../Auth/Auth-middleware')
 const router = express.Router()
 const Problems=require('../Models/Problems');
-router.get("/",authMiddleware,async (req,res)=>{
-    try {
-        const problems = await Problems.getAllProblems();
-        res.json(problems);
-    } catch (err) {
-        res.status(500).json({ message: 'Error fetching problems', error: err.message });
+router.get("/:id",authMiddleware,async (req,res)=>{
+    const id=req.params.id;
+    if(!id){
+        try {
+            const problems = await Problems.getAllProblems();
+            res.json(problems);
+        } catch (err) {
+            console.log(err);
+            res.status(500).json({ message: 'Error fetching'});
+        }
+    }else{
+        try {
+            const problems = await Problems.getSingleProblem(id);
+            res.send(problems);
+        } catch (err) {
+            console.log(err);
+            res.status(500).json({ message: `Error fetching problem ${id}`});
+        }
     }
+    
 })
 
 router.post("/",async (req,res)=>{
@@ -41,8 +54,18 @@ router.post("/",async (req,res)=>{
     }
 })
 
-router.post("/hint/:id",(req,res)=>{
-    
+router.get("/hint/:id",authMiddleware,async (req,res)=>{
+    try{
+        const challenge_id = req.params.id;
+        const hint = await Problems.getHint(challenge_id);
+        // console.log(hint);
+        res.status(200).send(hint[0]);
+    }catch(err){
+        console.log(err)
+        res.status(500).json({
+            message:"Couldn't fetch hint"
+        })
+    }
 })
 
 module.exports=router
