@@ -2,10 +2,10 @@ const express=require("express");
 const authRoute = require("./Auth/Auth-route");
 const mongoose = require("mongoose");
 const cookieParser = require("cookie-parser");
-const authMiddleware = require("./Auth/Auth-middleware");
 const cors=require("cors")
-const app=express();
+const authMiddleware = require("./Auth/Auth-middleware");
 const homeRoute=require('./Home/home-route')
+const app=express();
 app.use(cookieParser())
 app.use(express.json());
 app.use(cors({
