@@ -7,7 +7,8 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        orbitron: ['Orbitron', 'sans-serif'],
+        'orbitron': ['Orbitron', 'sans-serif'],
+        'inter' : ['Inter','sans-serif'],
       },
       colors: {
         'hacker-green' : '#19FF00'
