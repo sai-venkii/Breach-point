@@ -3,7 +3,7 @@ require("dotenv").config()
 const authMiddleware=require('../Auth/Auth-middleware')
 const router = express.Router()
 const Problems=require('../Models/Problems');
-router.get("/challenges",authMiddleware,async (req,res)=>{
+router.get("/",authMiddleware,async (req,res)=>{
     try {
         const problems = await Problems.getAllProblems();
         res.json(problems);
@@ -12,7 +12,7 @@ router.get("/challenges",authMiddleware,async (req,res)=>{
     }
 })
 
-router.post("/challenges",async (req,res)=>{
+router.post("/",async (req,res)=>{
     // console.log(req.body);
     try{
         const {
@@ -39,6 +39,10 @@ router.post("/challenges",async (req,res)=>{
         console.log(err);
         res.status(500).json({ message: "Cannot be Added"});
     }
+})
+
+router.post("/hint/:id",(req,res)=>{
+    
 })
 
 module.exports=router
