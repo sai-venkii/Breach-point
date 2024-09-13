@@ -5,13 +5,13 @@ const cookieParser = require("cookie-parser");
 const authMiddleware = require("./Auth/Auth-middleware");
 const cors=require("cors")
 const app=express();
+const cors = require('cors')
 const homeRoute=require('./Home/home-route')
 app.use(cookieParser())
 app.use(express.json());
 app.use(cors({
-    credentials: true
+    credentials:true
 }))
-
 require('dotenv').config();
 
 require('./connection')();

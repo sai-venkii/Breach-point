@@ -1,0 +1,48 @@
+/* Hide scrollbar */
+.scrollbar-hidden::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-hidden {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+  body{
+    background-color: black;
+  }
+  .logo{
+    height:65px;
+    margin:0px;
+    padding:0px;
+  }
+  .challenges-content {
+    padding: 10px;
+    color : #19FF00;
+  }
+  
+  ul {
+    margin: 0;
+    padding-left: 20px; /* Indent list items */
+  }
+  
+  li {
+    margin-bottom: 10px; /* Space between list items */
+  }
+
+
+.no-select {
+  user-select: none; 
+}
+
+.modal-content {
+  user-select: none; 
+}
+
+.line {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 2px;
+  height: 100%;
+  background-color: #19FF00; /* Same green color as your theme */
+}
