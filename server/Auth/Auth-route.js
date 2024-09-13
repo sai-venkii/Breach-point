@@ -1,7 +1,9 @@
 const express = require("express");
 const router = express.Router();
+const jwt = require("jsonwebtoken");
 const Teams = require('../Models/Teams');
 const bcrypt = require('bcrypt');
+require('dotenv').config()
 router.use(express.json());
 
 router.post("/register", async (req, res) => {
@@ -9,8 +11,12 @@ router.post("/register", async (req, res) => {
 
     try {
         const user = await Teams.findOne({ email: email });
+        const username = await Teams.findOne({name:teamName});
         if (user) {
             return res.status(400).json({ message: "Email Already Exists" });
+        }
+        if(username){
+            return res.status(400).json({ message: "Team name Already Exists" });
         }
         const hashedPassword = await bcrypt.hash(password, 10);
         const newTeam = new Teams({
@@ -32,12 +38,23 @@ router.post("/login", async (req, res) => {
 
     try {
         const team = await Teams.findOne({ name: teamName });
+        // console.log(team);
         if (!team) {
             return res.status(404).json({ message: "Team not found" });
         }
         const match = await bcrypt.compare(password, team.password);
         if (match) {
-            res.redirect('/');
+            const user={
+                team:team.name,
+                email:team.email
+            }
+            const token = jwt.sign(user,process.env.JWT_SECRET,{
+                expiresIn: '5hr'
+            });
+            res.json({
+                message:"Success",
+                token:token
+            });
         } else {
             res.status(401).json({ message: "Invalid credentials" });
         }
@@ -46,5 +63,7 @@ router.post("/login", async (req, res) => {
         res.status(500).json({ message: "Internal Server Error", error: err.message });
     }
 });
+
+
 
 module.exports = router;

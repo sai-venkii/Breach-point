@@ -1,12 +1,16 @@
 const mongoose = require("mongoose")
-const Schema = mongoose.Schema
+const AutoIncrement=require("mongoose-sequence")(mongoose);
 
-const problemModel = new Schema(
+const problemSchema = new mongoose.Schema(
     {
         name:{
             type:String,
             required:true,
             unique:true,
+        },
+        flag:{
+            type:String,
+            required:true
         },
         description:{
             type:String,
@@ -28,24 +32,31 @@ const problemModel = new Schema(
         },
         solves:{
             type:Number,
-            required:true,
+            default:0
         },
         connectionInfo:{
             type:String,
             required:true,
         },
-        id:{
-            type:Number,
-            required:true
-        },
         solvedTeams:{
             type:Array,
-            required:true,
-
+            default:[],
         },
     }
 )
 
-const Problems = mongoose.model("Problems",problemModel)
+problemSchema.plugin(AutoIncrement,{
+    inc_field:'id'
+})
 
-export default Problems
+problemSchema.statics.getAllProblems = async function() {
+    try {
+        return await this.find({}, 'id name category points');
+    } catch (err) {
+        console.error(err);
+        throw new Error('Error fetching problems');
+    }
+};
+
+const Problems = mongoose.model("Problems", problemSchema);
+module.exports = Problems;
