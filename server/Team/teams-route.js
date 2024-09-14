@@ -20,6 +20,7 @@ router.post("/submit/:id", authMiddleware, async (req, res) => {
   try {
     const id = req.params.id;
     const user_flag = req.body.flag;
+    const {team}=req.user;
     if (!id) {
       res.status(201).json({
         message: "Incorrect Parameters",
@@ -28,6 +29,8 @@ router.post("/submit/:id", authMiddleware, async (req, res) => {
     const {flag} = (await Challenges.getSingleChallenge(id, false))[0];
     // console.log(flag,user_flag);
     if (flag === user_flag) {
+      const updated_team = await Teams.updateScore(team,id);
+      // console.log(updated_team);
       res.status(200).send("Solved");
     } else {
       res.status(200).send("Incorrect Flag");

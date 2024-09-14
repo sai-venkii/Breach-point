@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const Teams = require("./Teams");
 const AutoIncrement = require("mongoose-sequence")(mongoose);
 
 const challengeSchema = new mongoose.Schema({
@@ -50,27 +51,6 @@ challengeSchema.plugin(AutoIncrement, {
 challengeSchema.statics.getAllChallenges = async function () {
   try {
     return await this.find({}, "id name category points -_id");
-    // const result = await this.aggregate([
-    //     {
-    //         $group:{
-    //             _id:"$category",
-    //             challenges:{
-    //                 $push:{
-    //                     name:"$name",
-    //                     id:"$id",
-    //                     points:"$points"
-    //                 }
-    //             }
-    //         },
-    //     },
-    //     {
-    //         $project:{
-    //             _id:0,
-    //             category:"$_id",
-    //             challenges:1
-    //         }
-    //     },
-    // ])
     // // console.log(result)
     // return result;
   } catch (err) {
@@ -106,9 +86,10 @@ challengeSchema.statics.getSingleChallenge = async function (
   }
 };
 
-challengeSchema.statics.updateScore = async function (teamName, question_id) {
-  console.log(teamName, question_id);
-};
+challengeSchema.statics.getScore=async function(id){
+  // console.log(id)
+  return (await this.find({id:id},'points -_id'))[0];
+}
 
 const Challenges = mongoose.model("Problems", challengeSchema);
 module.exports = Challenges;

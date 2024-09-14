@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const Challenges = require("./Challenges");
 const Schema = mongoose.Schema;
 
 const teamModels = new Schema({
@@ -42,5 +43,18 @@ teamModels.statics.getScore=async function (teamName){
     console.log(err);
   }
 }
+
+teamModels.statics.updateScore = async function (teamName, question_id) {
+  // console.log(teamName, question_id);
+  const {points}=await Challenges.getScore(question_id);
+  // console.log(points);
+  return await this.findOneAndUpdate({name:teamName},{
+      $inc:{score:points},
+      scoreTime:Date.now
+    },
+    {new:true}
+  );
+};
+
 const Teams = mongoose.model("Teams", teamModels);
 module.exports = Teams;
