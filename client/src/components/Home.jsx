@@ -1,36 +1,27 @@
-import React, { useEffect, useState } from "react";
-import "./Home.css";
-import logo from "../assets/breakp.jpeg";
+import React, { useEffect,useState } from 'react';
+import './Home.css';
+import logo from '../assets/breakp.jpeg';
+import { AiOutlineDown, AiOutlineUp } from 'react-icons/ai';
 import { motion } from "framer-motion";
-import axios from "axios";
+import axios from 'axios';
 
 export default function Home(props) {
-  const [data, setData] = useState(null);
-
+  const [data,setData] = useState(null)
   useEffect(() => {
-    const token =
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0ZWFtIjoidGVzdDIiLCJlbWFpbCI6IjIycGMwNEBwc2d0ZWNoLmFjLmluIiwiaWF0IjoxNzI2MjAxMzM1LCJleHAiOjE3MjYyMTkzMzV9.CjsQfm31EV1V59cE6AGWjcysrcVZhbjLF5asmK3WDf8";
-
     const fetchData = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:8082/api/challenges",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        console.log("Data:", response.data);
-        setData(response.data);
+        const response = await axios.get('http://localhost:8082/api/challenges', {
+          withCredentials:true
+        });
+        console.log('Data:', response.data);
+        setData(response.data)
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error('Error fetching data:', error);
       }
     };
     fetchData();
   }, []);
-
-  const [selectedChallenge, setSelectedChallenge] = useState(null);
+const [selectedChallenge, setSelectedChallenge] = useState(null);
 
   const openChallengeDetails = (challenge) => {
     setSelectedChallenge(challenge);
