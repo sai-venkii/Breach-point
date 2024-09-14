@@ -5,6 +5,7 @@ import axios from "axios"; // Import axios
 import { useNavigate } from "react-router-dom";
 
 const Login = () => {
+  axios.defaults.withCredentials = true
   const [isRegister, setIsRegister] = useState(false);
   const [teamName, setTeamName] = useState("");
   const [password, setPassword] = useState("");
@@ -102,6 +103,28 @@ const Login = () => {
                 Team Name
               </span>
             </motion.div>
+            
+            <AnimatePresence>
+              {isRegister && (
+                <motion.div
+                  className="flex flex-col-reverse"
+                  key="confirmPassword"
+                  variants={confirmPasswordVariants}
+                  initial="hidden"
+                  animate="visible"
+                  exit="exit"
+                >
+                  <input
+                    placeholder="Email"
+                    className="peer outline-none ring px-4 h-10 border-0 font-inter rounded-lg ring-gray-200 text-black duration-500 focus:ring-2 focus:border-gray-100 relative placeholder:duration-500 placeholder:absolute focus:placeholder:pt-10 text-s shadow-xl shadow-gray-400/10 focus:shadow-none focus:rounded-md focus:ring-hacker-green placeholder:text-black"
+                    type="text"
+                  />
+                  <span className="duration-500 opacity-0 peer-focus:opacity-100 text-hacker-green text-xs -translate-y-12 peer-focus:-translate-y-1">
+                    Email
+                  </span>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             <motion.div
               className="flex flex-col-reverse"
@@ -134,7 +157,7 @@ const Login = () => {
                 >
                   <input
                     placeholder="Confirm Password"
-                    className="peer outline-none ring px-4 h-10 border-0 font-inter rounded-lg ring-gray-200 duration-500 focus:ring-2 focus:border-gray-100 relative placeholder:duration-500 placeholder:absolute focus:placeholder:pt-10 text-s shadow-xl shadow-gray-400/10 focus:shadow-none focus:rounded-md focus:ring-hacker-green placeholder:text-black"
+                    className="peer outline-none ring px-4 h-10 border-0 font-inter rounded-lg ring-gray-200 text-black duration-500 focus:ring-2 focus:border-gray-100 relative placeholder:duration-500 placeholder:absolute focus:placeholder:pt-10 text-s shadow-xl shadow-gray-400/10 focus:shadow-none focus:rounded-md focus:ring-hacker-green placeholder:text-black"
                     type="password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
@@ -160,6 +183,7 @@ const Login = () => {
                 initial="hidden"
                 animate="visible"
                 exit="exit"
+                whileTap={{scale: 0.9}}
               >
                 {isRegister ? "Register" : "Login"}
               </motion.button>
@@ -174,13 +198,13 @@ const Login = () => {
               <span className="">
                 {isRegister ? "Already have an account?" : "Do not have an account?"}
               </span>
-              <button
+              <motion.button
                 type="button"
                 onClick={toggleForm}
                 className="ml-2 hover:underline font-semibold"
               >
                 {isRegister ? "Login" : "Register"}
-              </button>
+              </motion.button>
             </motion.div>
           </form>
         </div>
