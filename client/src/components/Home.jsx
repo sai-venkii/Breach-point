@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import axios from 'axios';
 
 export default function Home(props) {
+  axios.defaults.withCredentials = true
   const [data,setData] = useState(null)
   useEffect(() => {
     const fetchData = async () => {

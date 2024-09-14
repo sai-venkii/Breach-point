@@ -5,6 +5,7 @@ import axios from "axios"; // Import axios
 import { useNavigate } from "react-router-dom";
 
 const Login = () => {
+  axios.defaults.withCredentials = true
   const [isRegister, setIsRegister] = useState(false);
   const [teamName, setTeamName] = useState("");
   const [password, setPassword] = useState("");

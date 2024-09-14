@@ -50,7 +50,7 @@ teamModels.statics.updateScore = async function (teamName, question_id) {
   // console.log(points);
   return await this.findOneAndUpdate({name:teamName},{
       $inc:{score:points},
-      scoreTime:Date.now
+      scoreTime:Date.now()
     },
     {new:true}
   );
