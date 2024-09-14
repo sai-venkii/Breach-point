@@ -20,7 +20,7 @@ require('./connection')();
 const PORT = process.env.PORT || 5500
 app.use('/auth',authRoute);
 app.use('/api/team',teamRoute);
-app.use("/api/challenges",challengeRoute,authMiddleware);
+app.use("/api/challenges",challengeRoute);
 app.listen(PORT,()=>{
     console.log(`Server running at ${PORT}`)
 })
