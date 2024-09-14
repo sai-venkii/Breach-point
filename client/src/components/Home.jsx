@@ -20,7 +20,7 @@ export default function Home(props) {
   }
   const [data,setData] = useState(null)
   useEffect(() => {
-    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0ZWFtIjoidGVzdDIiLCJlbWFpbCI6IjIycGMwNEBwc2d0ZWNoLmFjLmluIiwiaWF0IjoxNzI2MjAxMzM1LCJleHAiOjE3MjYyMTkzMzV9.CjsQfm31EV1V59cE6AGWjcysrcVZhbjLF5asmK3WDf8';
+    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0ZWFtIjoidGVzdDEiLCJlbWFpbCI6IjIycGMyOEBwc2d0ZWNoLmFjLmluIiwiaWF0IjoxNzI2MjE1MDAyLCJleHAiOjE3MjYyMzMwMDJ9.MCTwZc4WTNmn46dopkTZpceCWUppY6RcdnkRxASGulE';
 
     const fetchData = async () => {
       try {
@@ -140,6 +140,12 @@ const [selectedChallenge, setSelectedChallenge] = useState(null);
               placeholder="Enter flag here..."
               className="border rounded px-3 py-2 w-full mb-4 no-select"
             />
+            <button
+              onClick={closeChallengeDetails}
+              className="bg-hacker-green text-white px-4 py-2 rounded hover:bg-green-600 font-orbitron no-select mr-4"
+            >
+              Submit
+            </button>
             <button
               onClick={closeChallengeDetails}
               className="bg-hacker-green text-white px-4 py-2 rounded hover:bg-green-600 font-orbitron no-select"

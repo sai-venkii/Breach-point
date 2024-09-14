@@ -1,41 +1,69 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence, easeInOut } from "framer-motion";
 import MatrixEffect from "./components/MatrixEffect";
+import axios from "axios"; // Import axios
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   const [isRegister, setIsRegister] = useState(false);
+  const [teamName, setTeamName] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
+  const navigate = useNavigate()
   const toggleForm = () => {
     setIsRegister((prevState) => !prevState);
   };
 
+  const handleSubmit = async (event) => {
+    event.preventDefault(); // Prevent default form submission
+
+    const url = 'http://localhost:8082/auth/login'; // Define your endpoint
+
+    const data = {
+      teamName,
+      password,
+      ...(isRegister && { confirmPassword }) // Include confirmPassword only if registering
+    };
+
+    try {
+      const response = await axios.post(url, data);
+      if (response.status == 200){
+        navigate('/home')
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      // Handle error (e.g., show an error message)
+    }
+  };
+
   const headerVariants = {
-    hidden : { opacity: 0, y: -20 },
-    visible : { opacity: 1, y: 0 , transition : { duration: 0.6, ease: "easeInOut" } },
-    exit : { opacity: 0, y: 20 }
-  }
+    hidden: { opacity: 0, y: -20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeInOut" } },
+    exit: { opacity: 0, y: 20 }
+  };
 
   const fieldVariants = {
     hidden: { opacity: 0, x: -20 },
-    visible: { opacity: 1, x: 0, transition : { duration: 0.6, delay: 0.2 } },
+    visible: { opacity: 1, x: 0, transition: { duration: 0.6, delay: 0.2 } },
     exit: { opacity: 0, x: 20 }
   };
 
   const buttonVariants = {
     hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 , transition : { duration: 0.8, ease: "easeInOut" } },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeInOut" } },
     exit: { opacity: 0, y: 20 },
   };
 
   const buttonContainerVariants = {
     hidden: { opacity: 0, height: 0 },
-    visible: { opacity: 1, height: "auto", transition : { duration: 0.6 } },
+    visible: { opacity: 1, height: "auto", transition: { duration: 0.6 } },
     exit: { opacity: 0, height: 0 }
   };
 
   const confirmPasswordVariants = {
     hidden: { opacity: 0, height: 0 },
-    visible: { opacity: 1, height: "auto", transition : { duration: 0.8, delay: 0.3,ease: easeInOut } },
+    visible: { opacity: 1, height: "auto", transition: { duration: 0.8, delay: 0.3, ease: easeInOut } },
     exit: { opacity: 0, height: 0, transition: { duration: 0.5 } }
   };
 
@@ -44,7 +72,6 @@ const Login = () => {
       <MatrixEffect />
       <div className="absolute inset-0 flex items-center justify-center">
         <div className="bg-black p-9 rounded-2xl text-white w-full max-w-md h-auto transition-all duration-700">
-
           <motion.h2
             className="text-3xl font-bold mb-6 text-center"
             variants={headerVariants}
@@ -56,7 +83,7 @@ const Login = () => {
             {isRegister ? "Register" : "Breach Point"}
           </motion.h2>
 
-          <form className="space-y-6">
+          <form className="space-y-6" onSubmit={handleSubmit}>
             <motion.div
               className="flex flex-col-reverse"
               variants={fieldVariants}
@@ -68,6 +95,8 @@ const Login = () => {
                 placeholder="Team Name"
                 className="peer outline-none ring px-4 h-10 border-0 font-inter rounded-lg ring-gray-200 text-black duration-500 focus:ring-2 focus:border-gray-100 relative placeholder:duration-500 placeholder:absolute focus:placeholder:pt-10 text-s shadow-xl shadow-gray-400/10 focus:shadow-none focus:rounded-md focus:ring-hacker-green placeholder:text-black"
                 type="text"
+                value={teamName}
+                onChange={(e) => setTeamName(e.target.value)}
               />
               <span className="duration-500 opacity-0 peer-focus:opacity-100 text-hacker-green text-xs -translate-y-12 peer-focus:-translate-y-1">
                 Team Name
@@ -85,6 +114,8 @@ const Login = () => {
                 placeholder="Password"
                 className="peer outline-none ring px-4 h-10 border-0 font-inter rounded-lg ring-gray-200 text-black duration-500 focus:ring-2 focus:border-gray-100 relative placeholder:duration-500 placeholder:absolute focus:placeholder:pt-10 text-s shadow-xl shadow-gray-400/10 focus:shadow-none focus:rounded-md focus:ring-hacker-green placeholder:text-black"
                 type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
               />
               <span className="duration-500 opacity-0 peer-focus:opacity-100 text-hacker-green text-xs -translate-y-12 peer-focus:-translate-y-1">
                 Password
@@ -105,6 +136,8 @@ const Login = () => {
                     placeholder="Confirm Password"
                     className="peer outline-none ring px-4 h-10 border-0 font-inter rounded-lg ring-gray-200 duration-500 focus:ring-2 focus:border-gray-100 relative placeholder:duration-500 placeholder:absolute focus:placeholder:pt-10 text-s shadow-xl shadow-gray-400/10 focus:shadow-none focus:rounded-md focus:ring-hacker-green placeholder:text-black"
                     type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
                   />
                   <span className="duration-500 opacity-0 peer-focus:opacity-100 text-hacker-green text-xs -translate-y-12 peer-focus:-translate-y-1">
                     Confirm Password

@@ -3,7 +3,9 @@ require("dotenv").config()
 const authMiddleware=require('../Auth/Auth-middleware')
 const router = express.Router()
 const Problems=require('../Models/Problems');
-router.get("/:id",authMiddleware,async (req,res)=>{
+
+
+router.get("/{:id}",authMiddleware,async (req,res)=>{
     const id=req.params.id;
     if(!id){
         try {
