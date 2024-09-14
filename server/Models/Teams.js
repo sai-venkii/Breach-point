@@ -32,5 +32,14 @@ const teamModels = new Schema({
     required: true,
   },
 });
+
+
+teamModels.statics.getScore=async (teamName)=>{
+  try{
+    return await this.find({name:teamName},'score').limit(1);
+  }catch(err){
+    console.log("Could not fetch score from db");
+  }
+}
 const Teams = mongoose.model("Teams", teamModels);
 module.exports = Teams;

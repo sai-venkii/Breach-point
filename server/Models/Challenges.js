@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const AutoIncrement = require("mongoose-sequence")(mongoose);
 
-const problemSchema = new mongoose.Schema({
+const challengeSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
@@ -43,11 +43,11 @@ const problemSchema = new mongoose.Schema({
   },
 });
 
-problemSchema.plugin(AutoIncrement, {
+challengeSchema.plugin(AutoIncrement, {
   inc_field: "id",
 });
 
-problemSchema.statics.getAllProblems = async function () {
+challengeSchema.statics.getAllChallenges = async function () {
   try {
     return await this.find({}, "id name category points -_id");
     // const result = await this.aggregate([
@@ -75,11 +75,11 @@ problemSchema.statics.getAllProblems = async function () {
     // return result;
   } catch (err) {
     console.error(err);
-    throw new Error("Error fetching problems");
+    throw new Error("Error fetching challenges");
   }
 };
 
-problemSchema.statics.getHint = async function (id) {
+challengeSchema.statics.getHint = async function (id) {
   try {
     return await this.find({ id: id }, "hints -_id").limit(1);
   } catch (err) {
@@ -88,14 +88,25 @@ problemSchema.statics.getHint = async function (id) {
   }
 };
 
-problemSchema.statics.getSingleProblem = async function (id, hide_flag = true) {
+challengeSchema.statics.getSingleChallenge = async function (
+  id,
+  hide_flag = true
+) {
   try {
     if (hide_flag) {
-      return await this.find({ id: id }, "-solvedTeams -_id -hints -__v -flag").limit(1);
+      return await this.find(
+        { id: id },
+        "-solvedTeams -_id -hints -__v -flag"
+      ).limit(1);
     } else {
       return await this.find({ id: id }, "flag -_id").limit(1);
     }
   } catch (err) {}
 };
-const Problems = mongoose.model("Problems", problemSchema);
-module.exports = Problems;
+
+challengeSchema.statics.updateScore = async function (teamName, question_id) {
+  console.log(teamName, question_id);
+};
+
+const Challenges = mongoose.model("Problems", challengeSchema);
+module.exports = Challenges;

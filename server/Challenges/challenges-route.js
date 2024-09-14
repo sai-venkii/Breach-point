@@ -2,24 +2,26 @@ const express = require("express");
 require("dotenv").config();
 const authMiddleware = require("../Auth/Auth-middleware");
 const router = express.Router();
-const Problems = require("../Models/Problems");
-router.get('/{:id}', authMiddleware, async (req, res) => {
+const Challenges = require("../Models/Challenges");
+router.get("/{:id}", authMiddleware, async (req, res) => {
   const id = req.params.id;
+  // console.log(id);
   if (!id) {
     try {
-      const problems = await Problems.getAllProblems();
-      res.json(problems);
+      const challenges = await Challenges.getAllChallenges();
+      res.json(challenges);
     } catch (err) {
       console.log(err);
       res.status(500).json({ message: "Error fetching" });
     }
   } else {
     try {
-      const problems = await Problems.getSingleProblem(id);
-      res.send(problems[0]);
+      const challenges = await Challenges.getSingleChallenge(id);
+      console.log(challenges)
+      res.send(challenges[0]);
     } catch (err) {
       console.log(err);
-      res.status(500).json({ message: `Error fetching problem ${id}` });
+      res.status(500).json({ message: `Error fetching Challenge ${id}` });
     }
   }
 });
@@ -40,7 +42,7 @@ router.post("/", async (req, res) => {
       solved_teams,
     } = req.body;
 
-    const problem = new Problems({
+    const Challenge = new Challenges({
       name: challenge_name,
       flag: flag,
       description: challenge_description,
@@ -52,9 +54,9 @@ router.post("/", async (req, res) => {
       connectionInfo: connectionInfo,
       solvedTeams: solved_teams,
     });
-    await problem.save();
+    await Challenge.save();
     res.status(200).json({
-      message: "Problem added",
+      message: "Challenge added",
     });
   } catch (err) {
     console.log(err);
@@ -65,38 +67,13 @@ router.post("/", async (req, res) => {
 router.get("/hint/:id", authMiddleware, async (req, res) => {
   try {
     const challenge_id = req.params.id;
-    const hint = await Problems.getHint(challenge_id);
+    const hint = await Challenges.getHint(challenge_id);
     // console.log(hint);
     res.status(200).send(hint[0]);
   } catch (err) {
     console.log(err);
     res.status(500).json({
       message: "Couldn't fetch hint",
-    });
-  }
-});
-
-router.post("/submit/:id", authMiddleware, async (req, res) => {
-  try {
-    const id = req.params.id;
-    const user_flag = req.body.flag;
-    if (!id) {
-      res.status(201).json({
-        message: "Incorrect Parameters",
-      });
-    }
-    const flag = await Problems.getSingleProblem(id, false);
-    // console.log(flag,user_flag);
-    if (flag[0].flag === user_flag) {
-        res.status(200).send("Solved");
-    } else {
-        res.status(200).send("Incorrect Flag");
-    }
-    
-  } catch (err) {
-    console.log(err);
-    res.status(500).json({
-      message: "Couldn't fetch flag",
     });
   }
 });
