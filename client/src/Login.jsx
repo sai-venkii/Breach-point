@@ -127,6 +127,7 @@ const Login = () => {
                 initial="hidden"
                 animate="visible"
                 exit="exit"
+                whileTap={{scale: 0.9}}
               >
                 {isRegister ? "Register" : "Login"}
               </motion.button>
@@ -141,13 +142,13 @@ const Login = () => {
               <span className="">
                 {isRegister ? "Already have an account?" : "Do not have an account?"}
               </span>
-              <button
+              <motion.button
                 type="button"
                 onClick={toggleForm}
                 className="ml-2 hover:underline font-semibold"
               >
                 {isRegister ? "Login" : "Register"}
-              </button>
+              </motion.button>
             </motion.div>
           </form>
         </div>
