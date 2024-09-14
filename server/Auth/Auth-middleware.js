@@ -2,8 +2,7 @@ const express=require("express");
 require('dotenv').config();
 const jwt=require("jsonwebtoken");
 const authMiddleware= (req,res,next)=>{
-    const authHeader = req.headers['authorization']
-    const token = authHeader && authHeader.split(' ')[1];
+    const token = req.cookies.auth;
     if(!token){
         return res.status(403).send("Not Authorized");
     }else{
