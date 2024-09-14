@@ -17,7 +17,7 @@ router.get("/{:id}", authMiddleware, async (req, res) => {
   } else {
     try {
       const challenges = await Challenges.getSingleChallenge(id);
-      console.log(challenges)
+      // console.log(challenges)
       res.send(challenges[0]);
     } catch (err) {
       console.log(err);

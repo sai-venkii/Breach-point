@@ -34,11 +34,12 @@ const teamModels = new Schema({
 });
 
 
-teamModels.statics.getScore=async (teamName)=>{
+teamModels.statics.getScore=async function (teamName){
   try{
-    return await this.find({name:teamName},'score').limit(1);
+    return await this.find({name:teamName},'name score -_id');
   }catch(err){
     console.log("Could not fetch score from db");
+    console.log(err);
   }
 }
 const Teams = mongoose.model("Teams", teamModels);

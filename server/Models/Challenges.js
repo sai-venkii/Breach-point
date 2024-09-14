@@ -101,7 +101,9 @@ challengeSchema.statics.getSingleChallenge = async function (
     } else {
       return await this.find({ id: id }, "flag -_id").limit(1);
     }
-  } catch (err) {}
+  } catch (err) {
+    console.log("Error fetching single problem");
+  }
 };
 
 challengeSchema.statics.updateScore = async function (teamName, question_id) {

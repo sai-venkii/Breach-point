@@ -8,8 +8,8 @@ const authMiddleware = require("../Auth/Auth-middleware");
 router.get("/score", authMiddleware, async (req, res) => {
   const { team } = req.user;
   try {
-    const score = await Teams.getScore(team);
-    res.status(200).json({ score: score });
+    const score = (await Teams.getScore(team))[0];
+    res.status(200).json(score);
   } catch (err) {
     console.log(err);
     res.send(500).json({ message: "Could not fetch team score" });
@@ -25,9 +25,9 @@ router.post("/submit/:id", authMiddleware, async (req, res) => {
         message: "Incorrect Parameters",
       });
     }
-    const flag = await Challenges.getSingleChallenge(id, false);
+    const {flag} = (await Challenges.getSingleChallenge(id, false))[0];
     // console.log(flag,user_flag);
-    if (flag[0].flag === user_flag) {
+    if (flag === user_flag) {
       res.status(200).send("Solved");
     } else {
       res.status(200).send("Incorrect Flag");
