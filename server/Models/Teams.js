@@ -28,7 +28,7 @@ const teamModels = new Schema({
     required: true,
   },
   solvedChallenges: {
-    type: Array,
+    type: [Number],
     default: [],
   }
 });

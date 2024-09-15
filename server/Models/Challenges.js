@@ -87,5 +87,11 @@ challengeSchema.statics.getScore=async function(id){
   return (await this.find({id:id},'points -_id'))[0];
 }
 
+challengeSchema.statics.updateSolves=async function (id) {
+  return await this.find({id:id},{
+    $inc:{solves:1}
+  })
+}
+
 const Challenges = mongoose.model("Problems", challengeSchema);
 module.exports = Challenges;
