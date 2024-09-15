@@ -1,69 +1,85 @@
-import React, { useEffect,useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './Home.css';
 import logo from '../assets/breakp.jpeg';
-import { AiOutlineDown, AiOutlineUp } from 'react-icons/ai';
 import { motion } from "framer-motion";
 import axios from 'axios';
 
 export default function Home(props) {
-  axios.defaults.withCredentials = true
-  const [data,setData] = useState(null)
-  const [team,setTeam] = useState(null)
-  const [isCompleted,setCompleted] = useState(false)
+  axios.defaults.withCredentials = true;
+  const [data, setData] = useState(null);
+  const [team, setTeam] = useState(null);
+  const [isCompleted, setCompleted] = useState(false);
+  const [selectedChallenge, setSelectedChallenge] = useState(null);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const Challengeresponse = await axios.get('http://localhost:8082/api/challenges', {
-          withCredentials:true
-        });
+        const Challengeresponse = await axios.get('http://localhost:8082/api/challenges', { withCredentials: true });
         console.log('Data:', Challengeresponse.data);
-        setData(Challengeresponse.data)
+        setData(Challengeresponse.data);
       } catch (error) {
         console.error('Error fetching data:', error);
       }
-      try{
-        const Teamresponse = await axios.get('http://localhost:8082/api/team/score', {
-          withCredentials:true
-        });
+
+      try {
+        const Teamresponse = await axios.get('http://localhost:8082/api/team/score', { withCredentials: true });
         console.log('Data:', Teamresponse.data);
-        setTeam(Teamresponse.data)
-      }
-      catch (error) {
+        setTeam(Teamresponse.data);
+      } catch (error) {
         console.error('Error fetching data:', error);
       }
     };
 
     fetchData();
   }, []);
-const [selectedChallenge, setSelectedChallenge] = useState(null);
 
   const openChallengeDetails = (challenge) => {
     setSelectedChallenge(challenge);
   };
+
   const closeChallengeDetails = () => {
     setSelectedChallenge(null);
+    setCompleted(false);
   };
 
-  const solveChallenge = () =>{
-    const flag = document.getElementById('flag_input').value
-    if(flag.length!== 0){
-      axios.post('http://localhost:8082/api/challenge/solve', {
-        challengeId:selectedChallenge.id,
-        teamId:team.id
-        })
-        .then((response) => {
-          console.log(response.data);
-          setCompleted(true)
-          })
-        .catch((error) => {
-            console.error(error);
-            });
+  const solveChallenge = async () => {
+    const flag = document.getElementById('flag_input').value;
+    const message = document.getElementById('message');
+  
+    if (flag.length !== 0) {
+      try {
+        // Send the flag to the backend using axios
+        const response = await axios.post(`http://localhost:8082/api/team/submit/${selectedChallenge.id}`, {
+          flag: flag
+        });
+  
+        if (response.data.message === "Already Solved!!") {
+          message.innerHTML = "This challenge has already been solved!";
+        } else if (response.data.status === "Solved") {
+          message.innerHTML = "Correct flag! Challenge solved.";
+          setCompleted(true);  // Mark the challenge as completed
+          // Optionally update the team score here if required
+          setTeam(prevTeam => ({
+            ...prevTeam,
+            score: response.data.score
+          }));
+        } else if (response.data.message === "Incorrect Flag") {
+          message.innerHTML = "Incorrect flag, please try again.";
+        } else if (response.data.message === "Incorrect challenge ID") {
+          message.innerHTML = "Invalid challenge. Please try again.";
+        }
+      } catch (error) {
+        console.error("Error submitting flag:", error);
+        message.innerHTML = "There was an error submitting the flag. Please try again.";
       }
-      else{
-        const message = document.getElementById('message')
-        message.innerHTML = "The Flag should not be empty"
-      }
-  }
+    } else {
+      message.innerHTML = "The Flag should not be empty";
+    }
+  };
+  
+
+  // Extract unique categories
+  const categories = data ? [...new Set(data.map(item => item.category))] : [];
 
   const navVariants = {
     hidden: { opacity: 0, y: -20 },
@@ -79,7 +95,7 @@ const [selectedChallenge, setSelectedChallenge] = useState(null);
 
   const challengeVariants = {
     hidden: { opacity: 0, x: -50 },
-    visible: { opacity: 1, x: 0, transition: { duration: 0.5,delay: 0.5 , ease: "easeOut" } },
+    visible: { opacity: 1, x: 0, transition: { duration: 0.5, delay: 0.5, ease: "easeOut" } },
   };
 
   return (
@@ -120,20 +136,18 @@ const [selectedChallenge, setSelectedChallenge] = useState(null);
       </motion.nav>
 
       {/* Team Info Section */}
-      {team && <div className="pt-16 bg-black">
-        <div className="text-center py-5">
-          <motion.p
-            className="text-2xl text-hacker-green font-bold font-orbitron p-3 no-select"
-          >
-            {team.name}
-          </motion.p>
-          <motion.p
-            className="text-2xl text-hacker-green font-orbitron no-select"
-          >
-            Score : {team.score}
-          </motion.p>
+      {team && (
+        <div className="pt-16 bg-black">
+          <div className="text-center py-5">
+            <motion.p className="text-3xl text-hacker-green font-bold p-3 no-select">
+              {team.name}
+            </motion.p>
+            <motion.p className="text-2xl text-hacker-green font-orbitron no-select">
+              Score : {team.score}
+            </motion.p>
+          </div>
         </div>
-      </div>}
+      )}
 
       {/* Challenges Section */}
       <div className="bg-black">
@@ -144,167 +158,114 @@ const [selectedChallenge, setSelectedChallenge] = useState(null);
           animate="visible"
           exit="exit"
         >
-          Challenges
+          CHALLENGES
         </motion.p>
       </div>
 
-      <div className="px-20 py-5">
-        <ul className="list-disc pl-6">
-          {/* OSINT Challenges */}
-          <motion.li
-            className="text-hacker-green text-2xl font-orbitron no-select"
+      <div className="challenge-list-container px-5 ml-6">
+        {categories.map((category) => (
+          <motion.div
+            key={category}
+            className="mb-10"
             variants={challengeVariants}
             initial="hidden"
             animate="visible"
           >
-            OSINT
-            <ul className="mt-4">
-              {data &&
-                data.map(
-                  (item) =>
-                    item.category === "OSINT" && (
-                      <motion.li
-                        key={item.id}
-                        className="font-orbitron cursor-pointer"
-                        onClick={() =>
-                          openChallengeDetails({
-                            name: item.name,
-                            category: item.category,
-                            points: item.points,
-                          })
-                        }
-                        whileHover={{ scale: 1.05, color: "#00FF00" }}
-                        transition={{ type: "spring", stiffness: 300 }}
-                      >
-                        {item.name}
-                      </motion.li>
-                    )
-                )}
-            </ul>
-          </motion.li>
-
-          {/* Crypto Challenges */}
-          <motion.li
-            className="text-hacker-green text-2xl font-orbitron no-select"
-            variants={challengeVariants}
-            initial="hidden"
-            animate="visible"
-          >
-            Crypto
-            <ul className="mt-4">
-              {data &&
-                data.map(
-                  (item) =>
-                    item.category === "Crypto" && (
-                      <motion.li
-                        key={item.id}
-                        className="font-orbitron cursor-pointer"
-                        onClick={() =>
-                          openChallengeDetails({
-                            name: item.name,
-                            category: item.category,
-                            points: item.points,
-                          })
-                        }
-                        whileHover={{ scale: 1.05, color: "#00FF00" }}
-                        transition={{ type: "spring", stiffness: 300 }}
-                      >
-                        {item.name}
-                      </motion.li>
-                    )
-                )}
-            </ul>
-          </motion.li>
-
-          {/* Forensics Challenges */}
-          <motion.li
-            className="text-hacker-green text-2xl font-orbitron no-select"
-            variants={challengeVariants}
-            initial="hidden"
-            animate="visible"
-          >
-            Forensics
-            <ul className="mt-4">
-              {data &&
-                data.map(
-                  (item) =>
-                    item.category === "Forensics" && (
-                      <motion.li
-                        key={item.id}
-                        className="font-orbitron cursor-pointer"
-                        onClick={() =>
-                          openChallengeDetails({
-                            name: item.name,
-                            category: item.category,
-                            points: item.points,
-                          })
-                        }
-                        whileHover={{ scale: 1.05, color: "#00FF00" }}
-                        transition={{ type: "spring", stiffness: 300 }}
-                      >
-                        {item.name}
-                      </motion.li>
-                    )
-                )}
-            </ul>
-          </motion.li>
-        </ul>
+            <h2 className="text-2xl font-bold text-hacker-green uppercase mb-5 border-b-2 border-hacker-green pb-3">
+              {category}
+            </h2>
+            <div className="ml-3 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {data
+                .filter((item) => item.category === category)
+                .map((item) => (
+                  <motion.div
+                    key={item.id}
+                    className="bg-gray-900 border-2 border-transparent hover:border-hacker-green p-6 rounded-lg text-center transition-all duration-300 ease-in-out transform hover:-translate-y-2 shadow-md hover:shadow-lg"
+                    onClick={() =>
+                      openChallengeDetails({
+                        id: item.id,
+                        name: item.name,
+                        category: item.category,
+                        points: item.points,
+                      })
+                    }
+                    whileHover={{ scale: 1.05 }}
+                    transition={{  }}
+                  >
+                    <h3 className="text-xl cursor-pointer font-bold text-hacker-green mb-3">
+                      {item.name}
+                    </h3>
+                    <p className="text-sm cursor-pointer text-gray-400">{item.points} points</p>
+                  </motion.div>
+                ))}
+            </div>
+          </motion.div>
+        ))}
       </div>
+
 
       {/* Modal for Challenge Details */}
       {selectedChallenge && (
-  <motion.div
-    className="fixed inset-0 flex items-center justify-center z-50"
-    initial={{ opacity: 0 }}
-    animate={{ opacity: 1 }}
-    exit={{ opacity: 0 }}
-  >
-    {/* Backdrop */}
-    <div
-      className="fixed inset-0 bg-black opacity-50"
-      onClick={closeChallengeDetails}
-    ></div>
-    
-    {/* Modal Content */}
-    <motion.div
-      className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-lg max-w-lg w-full z-10"
-      initial={{ scale: 0.8, opacity: 0 }}
-      animate={{ scale: 1, opacity: 1 }}
-      exit={{ scale: 0.8, opacity: 0 }}
-    >
-      <h2 className="text-2xl font-bold mb-4 text-hacker-green font-orbitron no-select">
-        {selectedChallenge.name}
-      </h2>
-      <p className="mb-4 font-orbitron text-hacker-green no-select">
-        {selectedChallenge.category}
-      </p>
-      <p className="mb-4 font-orbitron text-hacker-green no-select">
-        Number of Solves: {selectedChallenge.points}
-      </p>
-      <span id="message" className="text-red-500 font-orbitron"></span>
-      <input
-        id="flag_input"
-        type="text"
-        placeholder="Enter flag here..."
-        className="border rounded px-3 py-2 w-full mb-4 no-select"
-      />
-      <button
-        onClick={solveChallenge}
-        className="bg-hacker-green text-white px-4 py-2 rounded hover:bg-green-600 font-orbitron no-select mr-4"
-      >
-        Submit
-      </button>
-      <motion.button
-        onClick={closeChallengeDetails}
-        className="bg-hacker-green text-white px-4 py-2 rounded hover:bg-green-600 font-orbitron no-select"
-        whileHover={{ scale: 1.1 }}
-        transition={{ type: "spring", stiffness: 300 }}
-      >
-        Close
-      </motion.button>
-    </motion.div>
-  </motion.div>
-)}
+        <motion.div
+          className="fixed inset-0 flex items-center justify-center z-50"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+        >
+          {/* Backdrop */}
+          <div
+            className="fixed inset-0 bg-black opacity-50"
+            onClick={closeChallengeDetails}
+          ></div>
+
+          {/* Modal Content */}
+          <motion.div
+            className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-lg max-w-lg w-full z-10"
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.8, opacity: 0 }}
+          >
+            <h2 className="text-2xl font-bold mb-4 text-hacker-green font-orbitron no-select">
+              {selectedChallenge.name}
+            </h2>
+            <p className="mb-4 font-orbitron text-hacker-green no-select">
+              {selectedChallenge.category}
+            </p>
+            <p className="mb-4 font-orbitron text-hacker-green no-select">
+              Points : {selectedChallenge.points}
+            </p>
+            
+            {/* Display Result Messages */}
+            <span id="message" className="text-red-500 font-orbitron"></span>
+
+            <input
+              id="flag_input"
+              type="text"
+              placeholder="Enter flag here..."
+              className="border focus:border-none rounded px-3 focus:ring-hacker-green py-2 w-full mb-4 no-select"
+            />
+            
+            <motion.button
+              onClick={solveChallenge}
+              whileHover={{ scale: 1.1 }}
+              transition={{ type: "spring", stiffness: 300 }}
+              className="bg-hacker-green text-white px-4 py-2 rounded font-orbitron no-select mr-4"
+            >
+              Submit
+            </motion.button>
+
+            <motion.button
+              onClick={closeChallengeDetails}
+              className="bg-hacker-green text-white px-4 py-2 rounded font-orbitron no-select"
+              whileHover={{ scale: 1.1 }}
+              transition={{ type: "spring", stiffness: 300 }}
+            >
+              Close
+            </motion.button>
+          </motion.div>
+        </motion.div>
+      )}
+
 
       {isCompleted && (
         <motion.div
@@ -325,10 +286,10 @@ const [selectedChallenge, setSelectedChallenge] = useState(null);
           >
             <h2 className="text-2xl font-bold mb-4 text-hacker-green font-orbitron no-select">
               This challenge was already completed by one of your team members
-              </h2>
-              <button
+            </h2>
+            <button
               onClick={closeChallengeDetails}
-              className="bg-hacker-green text-white px-4 py-2 rounded hover:bg-green-600 font-orbitron no-select"
+              className="bg-hacker-green text-white px-4 py-2 rounded font-orbitron no-select"
               whileHover={{ scale: 1.1 }}
             >
               Close
