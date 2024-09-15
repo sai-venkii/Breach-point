@@ -38,10 +38,6 @@ const challengeSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  solvedTeams: {
-    type: Array,
-    default: [],
-  },
 });
 
 challengeSchema.plugin(AutoIncrement, {

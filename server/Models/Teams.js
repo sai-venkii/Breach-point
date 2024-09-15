@@ -18,11 +18,6 @@ const teamModels = new Schema({
     required: true,
     unique: true,
   },
-  isVerified: {
-    type: Boolean,
-    required: true,
-    default: false,
-  },
   scoreTime: {
     type: Date,
     required: true,
@@ -32,6 +27,10 @@ const teamModels = new Schema({
     type: String,
     required: true,
   },
+  solvedChallenges: {
+    type: Array,
+    default: [],
+  }
 });
 
 
@@ -55,6 +54,18 @@ teamModels.statics.updateScore = async function (teamName, question_id) {
     {new:true}
   );
 };
+
+teamModels.statics.getTeam=async function(teamName){
+  return await this.find({name:teamName},'-_id -password -__v');
+}
+
+teamModels.statics.addCompletedChallenge=async function(team,challenge_id){
+  return await this.findOneAndUpdate({name:team},{
+    $addToSet:{
+      solvedChallenges:challenge_id
+    }
+  },{new:true});
+}
 
 const Teams = mongoose.model("Teams", teamModels);
 module.exports = Teams;

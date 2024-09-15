@@ -39,7 +39,6 @@ router.post("/", async (req, res) => {
       points,
       solves,
       connectionInfo,
-      solved_teams,
     } = req.body;
 
     const Challenge = new Challenges({
@@ -52,7 +51,6 @@ router.post("/", async (req, res) => {
       points: points,
       solves: solves,
       connectionInfo: connectionInfo,
-      solvedTeams: solved_teams,
     });
     await Challenge.save();
     res.status(200).json({
