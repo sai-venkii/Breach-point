@@ -88,7 +88,7 @@ challengeSchema.statics.getScore=async function(id){
 }
 
 challengeSchema.statics.updateSolves=async function (id) {
-  return await this.find({id:id},{
+  return await this.findOneAndUpdate({id:id},{
     $inc:{solves:1}
   })
 }
