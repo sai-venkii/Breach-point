@@ -8,18 +8,31 @@ import axios from 'axios';
 export default function Home(props) {
   axios.defaults.withCredentials = true
   const [data,setData] = useState(null)
+  const [team,setTeam] = useState(null)
+  const [isCompleted,setCompleted] = useState(false)
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('http://localhost:8082/api/challenges', {
+        const Challengeresponse = await axios.get('http://localhost:8082/api/challenges', {
           withCredentials:true
         });
-        console.log('Data:', response.data);
-        setData(response.data)
+        console.log('Data:', Challengeresponse.data);
+        setData(Challengeresponse.data)
       } catch (error) {
         console.error('Error fetching data:', error);
       }
+      try{
+        const Teamresponse = await axios.get('http://localhost:8082/api/team/score', {
+          withCredentials:true
+        });
+        console.log('Data:', Teamresponse.data);
+        setTeam(Teamresponse.data)
+      }
+      catch (error) {
+        console.error('Error fetching data:', error);
+      }
     };
+
     fetchData();
   }, []);
 const [selectedChallenge, setSelectedChallenge] = useState(null);
@@ -30,6 +43,27 @@ const [selectedChallenge, setSelectedChallenge] = useState(null);
   const closeChallengeDetails = () => {
     setSelectedChallenge(null);
   };
+
+  const solveChallenge = () =>{
+    const flag = document.getElementById('flag_input').value
+    if(flag.length!== 0){
+      axios.post('http://localhost:8082/api/challenge/solve', {
+        challengeId:selectedChallenge.id,
+        teamId:team.id
+        })
+        .then((response) => {
+          console.log(response.data);
+          setCompleted(true)
+          })
+        .catch((error) => {
+            console.error(error);
+            });
+      }
+      else{
+        const message = document.getElementById('message')
+        message.innerHTML = "The Flag should not be empty"
+      }
+  }
 
   const navVariants = {
     hidden: { opacity: 0, y: -20 },
@@ -76,7 +110,7 @@ const [selectedChallenge, setSelectedChallenge] = useState(null);
 
           {/* Right section: Sign Out */}
           <motion.a
-            href="/"
+            href="/login"
             className="block px-3 mt-2 font-bold text-xl text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-hacker-green md:p-0 md:dark:hover:text-hacker-green dark:text-hacker-green dark:hover:bg-gray-700 dark:hover:text-hacker-green md:dark:hover:bg-transparent dark:border-gray-700 font-orbitron no-select"
             whileHover={{ scale: 1.1, transition: { duration: 0.3 } }}
           >
@@ -86,20 +120,20 @@ const [selectedChallenge, setSelectedChallenge] = useState(null);
       </motion.nav>
 
       {/* Team Info Section */}
-      <div className="pt-16 bg-black">
+      {team && <div className="pt-16 bg-black">
         <div className="text-center py-5">
           <motion.p
             className="text-2xl text-hacker-green font-bold font-orbitron p-3 no-select"
           >
-            {props.teamName}
+            {team.name}
           </motion.p>
           <motion.p
             className="text-2xl text-hacker-green font-orbitron no-select"
           >
-            {props.teamScore}
+            Score : {team.score}
           </motion.p>
         </div>
-      </div>
+      </div>}
 
       {/* Challenges Section */}
       <div className="bg-black">
@@ -219,6 +253,60 @@ const [selectedChallenge, setSelectedChallenge] = useState(null);
 
       {/* Modal for Challenge Details */}
       {selectedChallenge && (
+  <motion.div
+    className="fixed inset-0 flex items-center justify-center z-50"
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    exit={{ opacity: 0 }}
+  >
+    {/* Backdrop */}
+    <div
+      className="fixed inset-0 bg-black opacity-50"
+      onClick={closeChallengeDetails}
+    ></div>
+    
+    {/* Modal Content */}
+    <motion.div
+      className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-lg max-w-lg w-full z-10"
+      initial={{ scale: 0.8, opacity: 0 }}
+      animate={{ scale: 1, opacity: 1 }}
+      exit={{ scale: 0.8, opacity: 0 }}
+    >
+      <h2 className="text-2xl font-bold mb-4 text-hacker-green font-orbitron no-select">
+        {selectedChallenge.name}
+      </h2>
+      <p className="mb-4 font-orbitron text-hacker-green no-select">
+        {selectedChallenge.category}
+      </p>
+      <p className="mb-4 font-orbitron text-hacker-green no-select">
+        Number of Solves: {selectedChallenge.points}
+      </p>
+      <span id="message" className="text-red-500 font-orbitron"></span>
+      <input
+        id="flag_input"
+        type="text"
+        placeholder="Enter flag here..."
+        className="border rounded px-3 py-2 w-full mb-4 no-select"
+      />
+      <button
+        onClick={solveChallenge}
+        className="bg-hacker-green text-white px-4 py-2 rounded hover:bg-green-600 font-orbitron no-select mr-4"
+      >
+        Submit
+      </button>
+      <motion.button
+        onClick={closeChallengeDetails}
+        className="bg-hacker-green text-white px-4 py-2 rounded hover:bg-green-600 font-orbitron no-select"
+        whileHover={{ scale: 1.1 }}
+        transition={{ type: "spring", stiffness: 300 }}
+      >
+        Close
+      </motion.button>
+    </motion.div>
+  </motion.div>
+)}
+
+      {isCompleted && (
         <motion.div
           className="fixed inset-0 flex items-center justify-center z-50"
           initial={{ opacity: 0 }}
@@ -236,20 +324,9 @@ const [selectedChallenge, setSelectedChallenge] = useState(null);
             exit={{ scale: 0.8, opacity: 0 }}
           >
             <h2 className="text-2xl font-bold mb-4 text-hacker-green font-orbitron no-select">
-              {selectedChallenge.name}
-            </h2>
-            <p className="mb-4 font-orbitron text-hacker-green no-select">
-              {selectedChallenge.category}
-            </p>
-            <p className="mb-4 font-orbitron text-hacker-green no-select">
-              Number of Solves: {selectedChallenge.points}
-            </p>
-            <input
-              type="text"
-              placeholder="Enter flag here..."
-              className="border rounded px-3 py-2 w-full mb-4 no-select"
-            />
-            <button
+              This challenge was already completed by one of your team members
+              </h2>
+              <button
               onClick={closeChallengeDetails}
               className="bg-hacker-green text-white px-4 py-2 rounded hover:bg-green-600 font-orbitron no-select"
               whileHover={{ scale: 1.1 }}
