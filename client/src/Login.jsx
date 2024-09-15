@@ -17,24 +17,23 @@ const Login = () => {
   };
 
   const handleSubmit = async (event) => {
-    event.preventDefault(); // Prevent default form submission
+    event.preventDefault();
 
-    const url = 'http://localhost:8082/auth/login'; // Define your endpoint
+    const url = 'http://localhost:8082/auth/login';
 
     const data = {
       teamName,
       password,
-      ...(isRegister && { confirmPassword }) // Include confirmPassword only if registering
+      ...(isRegister && { confirmPassword })
     };
 
     try {
       const response = await axios.post(url, data);
       if (response.status == 200){
-        navigate('/home')
+        navigate('/')
       }
     } catch (error) {
       console.error('Error:', error);
-      // Handle error (e.g., show an error message)
     }
   };
 

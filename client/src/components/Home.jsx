@@ -33,9 +33,26 @@ export default function Home(props) {
     fetchData();
   }, []);
 
-  const openChallengeDetails = (challenge) => {
-    setSelectedChallenge(challenge);
+  const openChallengeDetails = async (challenge) => {
+    try {
+      const response = await axios.get(`http://localhost:8082/api/challenges/${challenge.id}`, {
+        withCredentials: true,
+      });
+  
+      const fullChallenge = response.data;
+
+      setSelectedChallenge({
+        id: fullChallenge.id,
+        name: fullChallenge.name,
+        category: fullChallenge.category,
+        points: fullChallenge.points,
+        description: fullChallenge.description,
+      });
+    } catch (error) {
+      console.error('Error fetching challenge details:', error);
+    }
   };
+  
 
   const closeChallengeDetails = () => {
     setSelectedChallenge(null);
@@ -48,7 +65,6 @@ export default function Home(props) {
   
     if (flag.length !== 0) {
       try {
-        // Send the flag to the backend using axios
         const response = await axios.post(`http://localhost:8082/api/team/submit/${selectedChallenge.id}`, {
           flag: flag
         });
@@ -57,8 +73,7 @@ export default function Home(props) {
           message.innerHTML = "This challenge has already been solved!";
         } else if (response.data.status === "Solved") {
           message.innerHTML = "Correct flag! Challenge solved.";
-          setCompleted(true);  // Mark the challenge as completed
-          // Optionally update the team score here if required
+          setCompleted(true);
           setTeam(prevTeam => ({
             ...prevTeam,
             score: response.data.score
@@ -77,8 +92,6 @@ export default function Home(props) {
     }
   };
   
-
-  // Extract unique categories
   const categories = data ? [...new Set(data.map(item => item.category))] : [];
 
   const navVariants = {
@@ -187,6 +200,7 @@ export default function Home(props) {
                         name: item.name,
                         category: item.category,
                         points: item.points,
+                        description: item.description,
                       })
                     }
                     whileHover={{ scale: 1.05 }}
@@ -196,6 +210,7 @@ export default function Home(props) {
                       {item.name}
                     </h3>
                     <p className="text-sm cursor-pointer text-gray-400">{item.points} points</p>
+                    <p className="text-sm cursor-pointer text-gray-400">{item.flag}</p>
                   </motion.div>
                 ))}
             </div>
@@ -204,7 +219,6 @@ export default function Home(props) {
       </div>
 
 
-      {/* Modal for Challenge Details */}
       {selectedChallenge && (
         <motion.div
           className="fixed inset-0 flex items-center justify-center z-50"
@@ -230,6 +244,9 @@ export default function Home(props) {
             </h2>
             <p className="mb-4 font-orbitron text-hacker-green no-select">
               {selectedChallenge.category}
+            </p>
+            <p className="mb-4 font-orbitron text-hacker-green no-select">
+              {selectedChallenge.description}
             </p>
             <p className="mb-4 font-orbitron text-hacker-green no-select">
               Points : {selectedChallenge.points}
@@ -285,7 +302,7 @@ export default function Home(props) {
             exit={{ scale: 0.8, opacity: 0 }}
           >
             <h2 className="text-2xl font-bold mb-4 text-hacker-green font-orbitron no-select">
-              This challenge was already completed by one of your team members
+              Solved
             </h2>
             <button
               onClick={closeChallengeDetails}
