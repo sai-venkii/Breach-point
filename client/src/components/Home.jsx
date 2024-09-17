@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import './Home.css';
-import logo from '../assets/breakp.jpeg';
+import logo from '../assets/breachpoint.png';
 import { motion } from "framer-motion";
 import axios from 'axios';
 

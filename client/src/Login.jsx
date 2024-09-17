@@ -55,20 +55,18 @@ const Login = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-
     if (!teamName || !password || (isRegister && (!email || !confirmPassword))) {
       setAlertType("error");
       setAlertMessage("Please fill in all required fields.");
       return;
     }
-
     if (isRegister && password !== confirmPassword) {
       setAlertType("error");
       setAlertMessage("Passwords do not match.");
       return;
     }
 
-    if (!passwordCriteria.length || !passwordCriteria.uppercase || !passwordCriteria.lowercase || !passwordCriteria.number || !passwordCriteria.specialChar) {
+    if (isRegister && (!passwordCriteria.length || !passwordCriteria.uppercase || !passwordCriteria.lowercase || !passwordCriteria.number || !passwordCriteria.specialChar)) {
       setPasswordError("Please meet all password criteria.");
       return;
     }
@@ -91,7 +89,7 @@ const Login = () => {
           }, 2000); // Wait for the alert message to show
         } else {
           setAlertMessage("Login successful! Redirecting to home...");
-          setTimeout(() => navigate('/home'), 2000);
+          setTimeout(() => navigate('/'), 2000);
         }
       }
     } catch (error) {
