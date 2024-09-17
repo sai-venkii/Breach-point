@@ -248,7 +248,7 @@ const Login = () => {
               </button>
             </motion.div>
 
-            {showPasswordCriteria && isRegister && (
+            {/* {showPasswordCriteria && isRegister && (
               <div className={`mt-2 text-sm ${!passwordCriteria.length || !passwordCriteria.uppercase || !passwordCriteria.lowercase || !passwordCriteria.number || !passwordCriteria.specialChar ? 'text-red-500' : 'text-gray-300'}`}>
                 <ul>
                   <li className={passwordCriteria.length ? 'text-green-500' : 'text-red-500'}>At least 8 characters long</li>
@@ -258,7 +258,7 @@ const Login = () => {
                   <li className={passwordCriteria.specialChar ? 'text-green-500' : 'text-red-500'}>Includes at least one special character (!@#$)</li>
                 </ul>
               </div>
-            )}
+            )} */}
 
             {isRegister && (
               <AnimatePresence>

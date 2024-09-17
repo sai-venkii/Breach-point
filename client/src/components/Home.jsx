@@ -108,7 +108,12 @@ export default function Home(props) {
 
   const challengeVariants = {
     hidden: { opacity: 0, x: -50 },
-    visible: { opacity: 1, x: 0, transition: { duration: 0.5, delay: 0.5, ease: "easeOut" } },
+    visible: { opacity: 1, x: 0, transition: { duration: 0.5, delay: 0.7, ease: "easeOut" } },
+  };
+
+  const modalVariants = {
+    hidden: { opacity: 0, x: -50 },
+    visible: { opacity: 1, x: 0, transition: { duration: 0.5, delay: 1., ease: "easeOut" } },
   };
 
   return (
@@ -150,12 +155,24 @@ export default function Home(props) {
 
       {/* Team Info Section */}
       {team && (
-        <div className="pt-16 bg-black">
+        <div className="pt-16 bg-black mt-2">
           <div className="text-center py-5">
-            <motion.p className="text-3xl text-hacker-green font-bold p-3 no-select">
+            <motion.p 
+              className="text-3xl text-hacker-green font-bold p-3 no-select"
+              variants={spanVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+            >
               {team.name}
             </motion.p>
-            <motion.p className="text-2xl text-hacker-green font-orbitron no-select">
+            <motion.p 
+              className="text-2xl text-hacker-green font-orbitron no-select"
+              variants={spanVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+            >
               Score : {team.score}
             </motion.p>
           </div>
@@ -187,7 +204,12 @@ export default function Home(props) {
             <h2 className="text-2xl font-bold text-hacker-green uppercase mb-5 border-b-2 border-hacker-green pb-3">
               {category}
             </h2>
-            <div className="ml-3 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <motion.div 
+              className="ml-3 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
+              variants={modalVariants}
+              initial="hidden"
+              animate="visible"
+            >
               {data
                 .filter((item) => item.category === category)
                 .map((item) => (
@@ -204,7 +226,6 @@ export default function Home(props) {
                       })
                     }
                     whileHover={{ scale: 1.05 }}
-                    transition={{  }}
                   >
                     <h3 className="text-xl cursor-pointer font-bold text-hacker-green mb-3">
                       {item.name}
@@ -213,7 +234,7 @@ export default function Home(props) {
                     <p className="text-sm cursor-pointer text-gray-400">{item.flag}</p>
                   </motion.div>
                 ))}
-            </div>
+            </motion.div>
           </motion.div>
         ))}
       </div>
