@@ -10,6 +10,8 @@ export default function Home(props) {
   const [team, setTeam] = useState(null);
   const [isCompleted, setCompleted] = useState(false);
   const [selectedChallenge, setSelectedChallenge] = useState(null);
+  const [hint, setHint] = useState(null); // New state for hint
+  const [showHintPrompt, setShowHintPrompt] = useState(false); // State for hint confirmation prompt
 
   useEffect(() => {
     const fetchData = async () => {
@@ -48,15 +50,44 @@ export default function Home(props) {
         points: fullChallenge.points,
         description: fullChallenge.description,
       });
+
     } catch (error) {
       console.error('Error fetching challenge details:', error);
     }
   };
-  
 
   const closeChallengeDetails = () => {
     setSelectedChallenge(null);
     setCompleted(false);
+    setHint(null); // Reset the hint when the modal is closed
+    setShowHintPrompt(false); // Reset the prompt state when modal is closed
+  };
+
+  const fetchHint = async (challengeId) => {
+    try {
+      const response = await axios.get(`http://localhost:8082/api/challenges/hint/${challengeId}`, { withCredentials: true });
+      console.log(response.data);
+      return response.data; // Assuming the API returns the hint text in a "hint" field
+    } catch (error) {
+      console.error('Error fetching hint:', error);
+      return null;
+    }
+  };
+
+  const promptForHint = async () => {
+    setShowHintPrompt(true);
+  };
+
+  const handleHintDecision = async (useHint) => {
+    if (useHint) {
+      const fetchedHint = await fetchHint(selectedChallenge.id);
+      if (fetchedHint) {
+        setHint(fetchedHint);
+      } else {
+        setHint("Hint could not be fetched.");
+      }
+    }
+    setShowHintPrompt(false); // Close the prompt regardless of the user's decision
   };
 
   const solveChallenge = async () => {
@@ -91,7 +122,7 @@ export default function Home(props) {
       message.innerHTML = "The Flag should not be empty";
     }
   };
-  
+
   const categories = data ? [...new Set(data.map(item => item.category))] : [];
 
   const navVariants = {
@@ -247,33 +278,38 @@ export default function Home(props) {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
         >
-          {/* Backdrop */}
-          <div
-            className="fixed inset-0 bg-black opacity-50"
-            onClick={closeChallengeDetails}
-          ></div>
-
-          {/* Modal Content */}
+          {/* Modal content */}
           <motion.div
             className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-lg max-w-lg w-full z-10"
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.8, opacity: 0 }}
           >
+            {/* Modal title, description, etc. */}
             <h2 className="text-2xl font-bold mb-4 text-hacker-green font-orbitron no-select">
               {selectedChallenge.name}
             </h2>
             <p className="mb-4 font-orbitron text-hacker-green no-select">
-              {selectedChallenge.category}
-            </p>
-            <p className="mb-4 font-orbitron text-hacker-green no-select">
               {selectedChallenge.description}
             </p>
             <p className="mb-4 font-orbitron text-hacker-green no-select">
-              Points : {selectedChallenge.points}
+              Points: {selectedChallenge.points}
             </p>
-            
-            {/* Display Result Messages */}
+
+            {/* Hint Section */}
+            {hint && <p className="mb-4 text-yellow-500 font-orbitron">Hint: {hint.hints}</p>}
+            {!hint && (
+              <motion.button
+                onClick={promptForHint}
+                className="bg-hacker-green text-white px-4 py-2 rounded font-orbitron no-select"
+                whileHover={{ scale: 1.1 }}
+                transition={{ type: "spring", stiffness: 300 }}
+              >
+                Use Hint
+              </motion.button>
+            )}
+
+            {/* Result message */}
             <span id="message" className="text-red-500 font-orbitron"></span>
 
             <input
@@ -304,34 +340,38 @@ export default function Home(props) {
         </motion.div>
       )}
 
-
-      {isCompleted && (
+      {/* Hint Prompt Modal */}
+      {showHintPrompt && (
         <motion.div
           className="fixed inset-0 flex items-center justify-center z-50"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
         >
-          <div
-            className="fixed inset-0 bg-black opacity-50"
-            onClick={closeChallengeDetails}
-          ></div>
+          <div className="fixed inset-0 bg-black opacity-50"></div>
           <motion.div
-            className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-lg max-w-lg w-full z-10 modal-content"
+            className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-lg max-w-sm w-full z-10"
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.8, opacity: 0 }}
           >
-            <h2 className="text-2xl font-bold mb-4 text-hacker-green font-orbitron no-select">
-              Solved
-            </h2>
-            <button
-              onClick={closeChallengeDetails}
-              className="bg-hacker-green text-white px-4 py-2 rounded font-orbitron no-select"
-              whileHover={{ scale: 1.1 }}
-            >
-              Close
-            </button>
+            <p className="mb-4 text-yellow-500 font-orbitron">
+              Are you sure you want to use a hint? It may affect your final score.
+            </p>
+            <div className="flex justify-between">
+              <button
+                onClick={() => handleHintDecision(true)}
+                className="bg-hacker-green text-white px-4 py-2 rounded font-orbitron no-select mr-4"
+              >
+                Yes, use hint
+              </button>
+              <button
+                onClick={() => handleHintDecision(false)}
+                className="bg-red-500 text-white px-4 py-2 rounded font-orbitron no-select"
+              >
+                No, cancel
+              </button>
+            </div>
           </motion.div>
         </motion.div>
       )}
