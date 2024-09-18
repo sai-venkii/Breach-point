@@ -10,8 +10,8 @@ export default function Home(props) {
   const [team, setTeam] = useState(null);
   const [isCompleted, setCompleted] = useState(false);
   const [selectedChallenge, setSelectedChallenge] = useState(null);
-  const [hints, setHints] = useState({}); // Store hints for each challenge
-  const [showHintPrompt, setShowHintPrompt] = useState(false); // State for hint confirmation prompt
+  const [hints, setHints] = useState({});
+  const [showHintPrompt, setShowHintPrompt] = useState(false); 
 
   useEffect(() => {
     const fetchData = async () => {
@@ -67,7 +67,7 @@ export default function Home(props) {
   const closeChallengeDetails = () => {
     setSelectedChallenge(null);
     setCompleted(false);
-    setShowHintPrompt(false); // Reset the prompt state when modal is closed
+    setShowHintPrompt(false);
   };
 
   const fetchHint = async (challengeId) => {
@@ -76,7 +76,7 @@ export default function Home(props) {
         `http://localhost:8082/api/challenges/hint/${challengeId}`,
         { withCredentials: true }
       );
-      return response.data.hints; // Assuming the API returns the hint text in a "hint" field
+      return response.data.hint; 
     } catch (error) {
       console.error("Error fetching hint:", error);
       return null;
@@ -93,7 +93,7 @@ export default function Home(props) {
       if (fetchedHint) {
         setHints((prevHints) => ({
           ...prevHints,
-          [selectedChallenge.id]: fetchedHint, // Store the hint for the specific challenge
+          [selectedChallenge.id]: fetchedHint,
         }));
       } else {
         setHints((prevHints) => ({
@@ -102,7 +102,7 @@ export default function Home(props) {
         }));
       }
     }
-    setShowHintPrompt(false); // Close the prompt regardless of the user's decision
+    setShowHintPrompt(false); 
   };
 
   const solveChallenge = async () => {
