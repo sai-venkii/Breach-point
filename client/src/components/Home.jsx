@@ -3,6 +3,8 @@ import './Home.css';
 import logo from '../assets/breachpoint.png';
 import { motion } from "framer-motion";
 import axios from 'axios';
+import { useNavigate } from "react-router-dom";
+
 
 export default function Home(props) {
   axios.defaults.withCredentials = true;
@@ -13,25 +15,36 @@ export default function Home(props) {
   const [hint, setHint] = useState(null); // New state for hint
   const [showHintPrompt, setShowHintPrompt] = useState(false); // State for hint confirmation prompt
 
+  const navigate = useNavigate();
   useEffect(() => {
     const fetchData = async () => {
-      try {
-        const Challengeresponse = await axios.get('http://localhost:8082/api/challenges', { withCredentials: true });
-        console.log('Data:', Challengeresponse.data);
-        setData(Challengeresponse.data);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-
-      try {
-        const Teamresponse = await axios.get('http://localhost:8082/api/team/score', { withCredentials: true });
-        console.log('Data:', Teamresponse.data);
-        setTeam(Teamresponse.data);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    };
-
+      // Fetch challenges
+      await axios.get('http://localhost:8082/api/challenges', { withCredentials: true })
+        .then(response => {
+          setData(response.data);
+          console.log(response.data)
+        })
+        .catch(err => {
+          if (err.response && err.response.status === 403) {
+            // Redirect on 403 error without logging to the console
+            navigate('/login');
+          }
+          // Optionally handle other errors silently if needed
+        });
+    
+      // Fetch team score
+      await axios.get('http://localhost:8082/api/team/score', { withCredentials: true })
+        .then(response => {
+          setTeam(response.data);
+        })
+        .catch(err => {
+          if (err.response && err.response.status === 403) {
+            // Redirect on 403 error without logging to the console
+            // navigate('/login');
+          }
+          // Optionally handle other errors silently if needed
+        });
+    };    
     fetchData();
   }, []);
 
