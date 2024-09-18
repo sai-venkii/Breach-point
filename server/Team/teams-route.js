@@ -54,7 +54,8 @@ router.post("/submit/:id", async (req, res) => {
     }
     else{
       if (flag[0].flag === user_flag) {
-        const updated_team=(await Teams.updateScore(team,id));
+        const {points}=await Challenges.getScore(id);
+        const updated_team=(await Teams.updateScore(team,points));
         res.status(200).json({
           status:"Solved",
           score:updated_team.score

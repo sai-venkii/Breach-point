@@ -43,9 +43,9 @@ teamModels.statics.getScore=async function (teamName){
   }
 }
 
-teamModels.statics.updateScore = async function (teamName, question_id) {
+teamModels.statics.updateScore = async function (teamName,points) {
   // console.log(teamName, question_id);
-  const {points}=await Challenges.getScore(question_id);
+ 
   // console.log(points);
   return await this.findOneAndUpdate({name:teamName},{
       $inc:{score:points},
