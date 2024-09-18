@@ -2,6 +2,7 @@ const express = require("express");
 require("dotenv").config();
 const authMiddleware = require("../Auth/Auth-middleware");
 const router = express.Router();
+const Teams=require("../Models/Teams");
 const Challenges = require("../Models/Challenges");
 router.get("/{:id}", authMiddleware, async (req, res) => {
   const id = req.params.id;
@@ -65,9 +66,15 @@ router.post("/", async (req, res) => {
 router.get("/hint/:id", authMiddleware, async (req, res) => {
   try {
     const challenge_id = req.params.id;
-    const hint = await Challenges.getHint(challenge_id);
+    const hints = await Challenges.getHint(challenge_id);
     // console.log(hint);
-    res.status(200).send(hint[0]);
+    const {team}=req.user;
+    const {points}=await Challenges.getScore(challenge_id);
+    const updated_team=(await Teams.updateScore(team,-1*(points*0.20)));
+    res.status(200).json({
+      hint:hints[0].hints,
+      score:updated_team.score
+    });
   } catch (err) {
     console.log(err);
     res.status(500).json({
