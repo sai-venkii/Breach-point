@@ -2,6 +2,21 @@ const mongoose = require("mongoose");
 const Teams = require("./Teams");
 const AutoIncrement = require("mongoose-sequence")(mongoose);
 
+const hintsSchema = new mongoose.Schema({
+  id: {
+    type:Number,
+    required:true,
+  },
+  hint: {
+    type:String,
+    required:true
+  },
+  pointReduce: {
+    type: Number,
+    required:true
+  },
+},{_id:false})
+
 const challengeSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -20,8 +35,14 @@ const challengeSchema = new mongoose.Schema({
     type: String,
   },
   hints: {
-    type: String,
+    type:[hintsSchema],
+    default:[]
   },
+  hintCount:{
+    type:Number,
+    required:true,
+    default:0
+  },  
   category: {
     type: String,
     required: true,
@@ -36,12 +57,16 @@ const challengeSchema = new mongoose.Schema({
   },
   connectionInfo: {
     type: String,
-    required: true,
   },
 });
 
 challengeSchema.plugin(AutoIncrement, {
   inc_field: "id",
+});
+
+challengeSchema.pre('save', function (next) {
+  this.hintCount = this.hints.length;
+  next();
 });
 
 challengeSchema.statics.getAllChallenges = async function () {
@@ -55,9 +80,9 @@ challengeSchema.statics.getAllChallenges = async function () {
   }
 };
 
-challengeSchema.statics.getHint = async function (id) {
+challengeSchema.statics.getHint = async function (challenge_id) {
   try {
-    return await this.find({ id: id }, "hints -_id").limit(1);
+    return await this.find({ id: challenge_id }, "hints -_id").limit(1);
   } catch (err) {
     console.log(err);
     throw new Error("Error returning Hint");
@@ -72,7 +97,7 @@ challengeSchema.statics.getSingleChallenge = async function (
     if (hide_flag) {
       return await this.find(
         { id: id },
-        "-solvedTeams -_id -hints -__v -flag"
+        "-solvedTeams -_id -__v -flag"
       ).limit(1);
     } else {
       return await this.find({ id: id }, "flag -_id").limit(1);
@@ -93,5 +118,5 @@ challengeSchema.statics.updateSolves=async function (id) {
   })
 }
 
-const Challenges = mongoose.model("Problems", challengeSchema);
+const Challenges = mongoose.model("Challenges", challengeSchema);
 module.exports = Challenges;
