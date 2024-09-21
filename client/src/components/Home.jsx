@@ -1,10 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import './Home.css';
-import logo from '../assets/breachpoint.png';
+import React, { useEffect, useState } from "react";
+import "./Home.css";
+import logo from "../assets/breachpoint.png";
 import { motion } from "framer-motion";
-import axios from 'axios';
-import { useNavigate } from "react-router-dom";
-
+import axios from "axios";
 
 export default function Home(props) {
   axios.defaults.withCredentials = true;
@@ -12,48 +10,46 @@ export default function Home(props) {
   const [team, setTeam] = useState(null);
   const [isCompleted, setCompleted] = useState(false);
   const [selectedChallenge, setSelectedChallenge] = useState(null);
-  const [hint, setHint] = useState(null); // New state for hint
-  const [showHintPrompt, setShowHintPrompt] = useState(false); // State for hint confirmation prompt
+  const [hints, setHints] = useState({});
+  const [showHintPrompt, setShowHintPrompt] = useState(false); 
 
-  const navigate = useNavigate();
   useEffect(() => {
     const fetchData = async () => {
-      // Fetch challenges
-      await axios.get('http://localhost:8082/api/challenges', { withCredentials: true })
-        .then(response => {
-          setData(response.data);
-          console.log(response.data)
-        })
-        .catch(err => {
-          if (err.response && err.response.status === 403) {
-            // Redirect on 403 error without logging to the console
-            navigate('/login');
-          }
-          // Optionally handle other errors silently if needed
-        });
-    
-      // Fetch team score
-      await axios.get('http://localhost:8082/api/team/score', { withCredentials: true })
-        .then(response => {
-          setTeam(response.data);
-        })
-        .catch(err => {
-          if (err.response && err.response.status === 403) {
-            // Redirect on 403 error without logging to the console
-            // navigate('/login');
-          }
-          // Optionally handle other errors silently if needed
-        });
-    };    
+      try {
+        const Challengeresponse = await axios.get(
+          "http://localhost:8082/api/challenges",
+          { withCredentials: true }
+        );
+        console.log("Data:", Challengeresponse.data);
+        setData(Challengeresponse.data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+
+      try {
+        const Teamresponse = await axios.get(
+          "http://localhost:8082/api/team/score",
+          { withCredentials: true }
+        );
+        console.log("Data:", Teamresponse.data);
+        setTeam(Teamresponse.data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
     fetchData();
   }, []);
 
   const openChallengeDetails = async (challenge) => {
     try {
-      const response = await axios.get(`http://localhost:8082/api/challenges/${challenge.id}`, {
-        withCredentials: true,
-      });
-  
+      const response = await axios.get(
+        `http://localhost:8082/api/challenges/${challenge.id}`,
+        {
+          withCredentials: true,
+        }
+      );
+
       const fullChallenge = response.data;
 
       setSelectedChallenge({
@@ -63,26 +59,26 @@ export default function Home(props) {
         points: fullChallenge.points,
         description: fullChallenge.description,
       });
-
     } catch (error) {
-      console.error('Error fetching challenge details:', error);
+      console.error("Error fetching challenge details:", error);
     }
   };
 
   const closeChallengeDetails = () => {
     setSelectedChallenge(null);
     setCompleted(false);
-    setHint(null); // Reset the hint when the modal is closed
-    setShowHintPrompt(false); // Reset the prompt state when modal is closed
+    setShowHintPrompt(false);
   };
 
   const fetchHint = async (challengeId) => {
     try {
-      const response = await axios.get(`http://localhost:8082/api/challenges/hint/${challengeId}`, { withCredentials: true });
-      console.log(response.data);
-      return response.data; // Assuming the API returns the hint text in a "hint" field
+      const response = await axios.get(
+        `http://localhost:8082/api/challenges/hint/${challengeId}`,
+        { withCredentials: true }
+      );
+      return response.data.hint; 
     } catch (error) {
-      console.error('Error fetching hint:', error);
+      console.error("Error fetching hint:", error);
       return null;
     }
   };
@@ -95,32 +91,41 @@ export default function Home(props) {
     if (useHint) {
       const fetchedHint = await fetchHint(selectedChallenge.id);
       if (fetchedHint) {
-        setHint(fetchedHint);
+        setHints((prevHints) => ({
+          ...prevHints,
+          [selectedChallenge.id]: fetchedHint,
+        }));
       } else {
-        setHint("Hint could not be fetched.");
+        setHints((prevHints) => ({
+          ...prevHints,
+          [selectedChallenge.id]: "Hint could not be fetched.",
+        }));
       }
     }
-    setShowHintPrompt(false); // Close the prompt regardless of the user's decision
+    setShowHintPrompt(false); 
   };
 
   const solveChallenge = async () => {
-    const flag = document.getElementById('flag_input').value;
-    const message = document.getElementById('message');
-  
+    const flag = document.getElementById("flag_input").value;
+    const message = document.getElementById("message");
+
     if (flag.length !== 0) {
       try {
-        const response = await axios.post(`http://localhost:8082/api/team/submit/${selectedChallenge.id}`, {
-          flag: flag
-        });
-  
+        const response = await axios.post(
+          `http://localhost:8082/api/team/submit/${selectedChallenge.id}`,
+          {
+            flag: flag,
+          }
+        );
+
         if (response.data.message === "Already Solved!!") {
           message.innerHTML = "This challenge has already been solved!";
         } else if (response.data.status === "Solved") {
           message.innerHTML = "Correct flag! Challenge solved.";
           setCompleted(true);
-          setTeam(prevTeam => ({
+          setTeam((prevTeam) => ({
             ...prevTeam,
-            score: response.data.score
+            score: response.data.score,
           }));
         } else if (response.data.message === "Incorrect Flag") {
           message.innerHTML = "Incorrect flag, please try again.";
@@ -129,35 +134,54 @@ export default function Home(props) {
         }
       } catch (error) {
         console.error("Error submitting flag:", error);
-        message.innerHTML = "There was an error submitting the flag. Please try again.";
+        message.innerHTML =
+          "There was an error submitting the flag. Please try again.";
       }
     } else {
       message.innerHTML = "The Flag should not be empty";
     }
   };
 
-  const categories = data ? [...new Set(data.map(item => item.category))] : [];
+  const categories = data
+    ? [...new Set(data.map((item) => item.category))]
+    : [];
 
   const navVariants = {
     hidden: { opacity: 0, y: -20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: "easeInOut" } },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.7, ease: "easeInOut" },
+    },
     exit: { opacity: 0, y: 20 },
   };
 
   const spanVariants = {
     hidden: { opacity: 0, y: -20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: "easeInOut" } },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.7, ease: "easeInOut" },
+    },
     exit: { opacity: 0, y: 20 },
   };
 
   const challengeVariants = {
     hidden: { opacity: 0, x: -50 },
-    visible: { opacity: 1, x: 0, transition: { duration: 0.5, delay: 0.7, ease: "easeOut" } },
+    visible: {
+      opacity: 1,
+      x: 0,
+      transition: { duration: 0.5, delay: 0.7, ease: "easeOut" },
+    },
   };
 
   const modalVariants = {
     hidden: { opacity: 0, x: -50 },
-    visible: { opacity: 1, x: 0, transition: { duration: 0.5, delay: 1., ease: "easeOut" } },
+    visible: {
+      opacity: 1,
+      x: 0,
+      transition: { duration: 0.5, delay: 1, ease: "easeOut" },
+    },
   };
 
   return (
@@ -201,7 +225,7 @@ export default function Home(props) {
       {team && (
         <div className="pt-16 bg-black mt-2">
           <div className="text-center py-5">
-            <motion.p 
+            <motion.p
               className="text-3xl text-hacker-green font-bold p-3 no-select"
               variants={spanVariants}
               initial="hidden"
@@ -210,7 +234,7 @@ export default function Home(props) {
             >
               {team.name}
             </motion.p>
-            <motion.p 
+            <motion.p
               className="text-2xl text-hacker-green font-orbitron no-select"
               variants={spanVariants}
               initial="hidden"
@@ -248,7 +272,7 @@ export default function Home(props) {
             <h2 className="text-2xl font-bold text-hacker-green uppercase mb-5 border-b-2 border-hacker-green pb-3">
               {category}
             </h2>
-            <motion.div 
+            <motion.div
               className="ml-3 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
               variants={modalVariants}
               initial="hidden"
@@ -274,15 +298,15 @@ export default function Home(props) {
                     <h3 className="text-xl cursor-pointer font-bold text-hacker-green mb-3">
                       {item.name}
                     </h3>
-                    <p className="text-sm cursor-pointer text-gray-400">{item.points} points</p>
-                    <p className="text-sm cursor-pointer text-gray-400">{item.flag}</p>
+                    <p className="text-sm cursor-pointer text-gray-400">
+                      {item.points} points
+                    </p>
                   </motion.div>
                 ))}
             </motion.div>
           </motion.div>
         ))}
       </div>
-
 
       {selectedChallenge && (
         <motion.div
@@ -291,6 +315,12 @@ export default function Home(props) {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
         >
+          <motion.div
+            className="bg-gray-900 bg-opacity-75 absolute inset-0"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          ></motion.div>
           {/* Modal content */}
           <motion.div
             className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-lg max-w-lg w-full z-10"
@@ -309,81 +339,101 @@ export default function Home(props) {
               Points: {selectedChallenge.points}
             </p>
 
-            {/* Hint Section */}
-            {hint && <p className="mb-4 text-yellow-500 font-orbitron">Hint: {hint.hints}</p>}
-            {!hint && (
+            {hints[selectedChallenge.id] ? (
+              <div>
+                <p className="mb-4 font-orbitron text-orange-500 no-select">
+                  Hint: {hints[selectedChallenge.id]}
+                </p>
+              </div>
+            ) : null}
+
+            {showHintPrompt && (
+              <motion.div
+                className="fixed inset-0 flex items-center justify-center z-50"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+              >
+                <motion.div
+                  className="bg-gray-900 bg-opacity-75 absolute inset-0"
+                  onClick={() => setShowHintPrompt(false)}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                ></motion.div>
+
+                <motion.div
+                  className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-lg max-w-sm w-full z-10"
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0.8, opacity: 0 }}
+                >
+                  <p className="mb-4 text-yellow-500 font-orbitron">
+                    Are you sure you want to use a hint? It may affect your
+                    final score.
+                  </p>
+                  <div className="flex justify-between">
+                    <button
+                      onClick={() => handleHintDecision(true)}
+                      className="bg-hacker-green text-white px-4 py-2 rounded font-orbitron no-select mr-4"
+                    >
+                      Yes, use hint
+                    </button>
+                    <button
+                      onClick={() => handleHintDecision(false)}
+                      className="bg-red-500 text-white px-4 py-2 rounded font-orbitron no-select"
+                    >
+                      No, cancel
+                    </button>
+                  </div>
+                </motion.div>
+              </motion.div>
+            )}
+
+            <div className="mt-4">
+              <input
+                id="flag_input"
+                type="text"
+                placeholder="Enter flag here..."
+                className="border focus:border-none rounded px-3 focus:ring-hacker-green py-2 w-full mb-4 no-select"
+              />
+              <p id="message" className="text-red-500 mt-2 font-orbitron"></p>
               <motion.button
-                onClick={promptForHint}
+                onClick={solveChallenge}
+                whileHover={{ scale: 1.1 }}
+                transition={{ type: "spring", stiffness: 300 }}
+                className="bg-hacker-green text-white px-4 py-2 rounded font-orbitron no-select mr-4"
+              >
+                Submit
+              </motion.button>
+
+              <motion.button
+                onClick={closeChallengeDetails}
                 className="bg-hacker-green text-white px-4 py-2 rounded font-orbitron no-select"
                 whileHover={{ scale: 1.1 }}
                 transition={{ type: "spring", stiffness: 300 }}
               >
-                Use Hint
+                Close
               </motion.button>
-            )}
-
-            {/* Result message */}
-            <span id="message" className="text-red-500 font-orbitron"></span>
-
-            <input
-              id="flag_input"
-              type="text"
-              placeholder="Enter flag here..."
-              className="border focus:border-none rounded px-3 focus:ring-hacker-green py-2 w-full mb-4 no-select"
-            />
-            
-            <motion.button
-              onClick={solveChallenge}
-              whileHover={{ scale: 1.1 }}
-              transition={{ type: "spring", stiffness: 300 }}
-              className="bg-hacker-green text-white px-4 py-2 rounded font-orbitron no-select mr-4"
-            >
-              Submit
-            </motion.button>
-
-            <motion.button
-              onClick={closeChallengeDetails}
-              className="bg-hacker-green text-white px-4 py-2 rounded font-orbitron no-select"
-              whileHover={{ scale: 1.1 }}
-              transition={{ type: "spring", stiffness: 300 }}
-            >
-              Close
-            </motion.button>
-          </motion.div>
-        </motion.div>
-      )}
-
-      {/* Hint Prompt Modal */}
-      {showHintPrompt && (
-        <motion.div
-          className="fixed inset-0 flex items-center justify-center z-50"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-        >
-          <div className="fixed inset-0 bg-black opacity-50"></div>
-          <motion.div
-            className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-lg max-w-sm w-full z-10"
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.8, opacity: 0 }}
-          >
-            <p className="mb-4 text-yellow-500 font-orbitron">
-              Are you sure you want to use a hint? It may affect your final score.
-            </p>
-            <div className="flex justify-between">
-              <button
-                onClick={() => handleHintDecision(true)}
-                className="bg-hacker-green text-white px-4 py-2 rounded font-orbitron no-select mr-4"
+              {!hints[selectedChallenge.id] && (
+                <motion.button
+                  onClick={promptForHint}
+                  className="bg-yellow-500 ml-3 text-white px-4 py-2 rounded font-orbitron no-select"
+                  whileHover={{ scale: 1.1 }}
+                  transition={{ type: "spring", stiffness: 300 }}
+                >
+                  Use Hint
+                </motion.button>
+              )}
+              <motion.a
+                href="http://localhost:8082/api/challenges/file" // Replace with actual file URL
+                download
+                className="bg-blue-500 ml-3 text-white px-5 py-[10px] rounded font-orbitron no-select"
+                whileHover={{ scale: 1.1 }}
+                transition={{ type: "spring", stiffness: 300 }}
               >
-                Yes, use hint
-              </button>
-              <button
-                onClick={() => handleHintDecision(false)}
-                className="bg-red-500 text-white px-4 py-2 rounded font-orbitron no-select"
-              >
-                No, cancel
-              </button>
+                File
+              </motion.a>
             </div>
           </motion.div>
         </motion.div>
