@@ -184,7 +184,7 @@ const Login = () => {
             >
               <input
                 placeholder="Team Name"
-                className="peer outline-none ring px-4 h-10 border-0 font-inter rounded-lg ring-gray-200 text-black duration-500 focus:ring-2 focus:border-gray-100 relative placeholder:duration-500 placeholder:absolute focus:placeholder:pt-10 shadow-xl shadow-gray-400/10 focus:shadow-none focus:rounded-md focus:ring-hacker-green placeholder:text-black"
+                className="peer outline-none ring border-0 font-inter rounded-lg ring-gray-200 text-black duration-500 focus:ring-2 focus:border-gray-100 relative placeholder:duration-500 placeholder:absolute focus:placeholder:pt-10 shadow-xl shadow-gray-400/10 focus:shadow-none focus:rounded-md focus:ring-hacker-green placeholder:text-black"
                 type="text"
                 value={teamName}
                 onChange={(e) => setTeamName(e.target.value)}
@@ -206,7 +206,7 @@ const Login = () => {
                 >
                   <input
                     placeholder="Email"
-                    className="peer outline-none ring px-4 h-10 border-0 font-inter rounded-lg ring-gray-200 text-black duration-500 focus:ring-2 focus:border-gray-100 relative placeholder:duration-500 placeholder:absolute focus:placeholder:pt-10 shadow-xl shadow-gray-400/10 focus:shadow-none focus:rounded-md focus:ring-hacker-green placeholder:text-black"
+                    className="peer outline-none ring border-0 font-inter rounded-lg ring-gray-200 text-black duration-500 focus:ring-2 focus:border-gray-100 relative placeholder:duration-500 placeholder:absolute focus:placeholder:pt-10 shadow-xl shadow-gray-400/10 focus:shadow-none focus:rounded-md focus:ring-hacker-green placeholder:text-black"
                     type="text"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
@@ -227,7 +227,7 @@ const Login = () => {
             >
               <input
                 placeholder="Password"
-                className={`peer outline-none ring px-4 h-10 border-0 font-inter rounded-lg ring-gray-200 text-black duration-500 focus:ring-2 focus:border-gray-100 relative placeholder:duration-500 placeholder:absolute focus:placeholder:pt-10 shadow-xl shadow-gray-400/10 focus:shadow-none focus:rounded-md focus:ring-hacker-green placeholder:text-black ${passwordError ? 'border-red-500' : ''}`}
+                className={`peer outline-none ring border-0 font-inter rounded-lg ring-gray-200 text-black duration-500 focus:ring-2 focus:border-gray-100 relative placeholder:duration-500 placeholder:absolute focus:placeholder:pt-10 shadow-xl shadow-gray-400/10 focus:shadow-none focus:rounded-md focus:ring-hacker-green placeholder:text-black ${passwordError ? 'border-red-500' : ''}`}
                 type={passwordVisible ? "text" : "password"}
                 value={password}
                 onFocus={() => setShowPasswordCriteria(isRegister)}
@@ -242,7 +242,6 @@ const Login = () => {
                 className="absolute right-4 top-1/2 transform -translate-y-1/2"
                 onClick={() => setPasswordVisible(prev => !prev)}
               >
-                {passwordVisible ? <FaEyeSlash size={20} color="gray" /> : <FaEye size={20} color="gray" />}
               </button>
             </motion.div>
 
@@ -270,7 +269,7 @@ const Login = () => {
                 >
                   <input
                     placeholder="Confirm Password"
-                    className="peer outline-none ring px-4 h-10 border-0 font-inter rounded-lg ring-gray-200 text-black duration-500 focus:ring-2 focus:border-gray-100 relative placeholder:duration-500 placeholder:absolute focus:placeholder:pt-10 shadow-xl shadow-gray-400/10 focus:shadow-none focus:rounded-md focus:ring-hacker-green placeholder:text-black"
+                    className="peer outline-none ring border-0 font-inter rounded-lg ring-gray-200 text-black duration-500 focus:ring-2 focus:border-gray-100 relative placeholder:duration-500 placeholder:absolute focus:placeholder:pt-10 shadow-xl shadow-gray-400/10 focus:shadow-none focus:rounded-md focus:ring-hacker-green placeholder:text-black"
                     type="password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}

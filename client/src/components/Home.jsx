@@ -283,7 +283,15 @@ export default function Home(props) {
                 .map((item) => (
                   <motion.div
                     key={item.id}
-                    className="bg-gray-900 border-2 border-transparent hover:border-hacker-green p-6 rounded-lg text-center transition-all duration-300 ease-in-out transform hover:-translate-y-2 shadow-md hover:shadow-lg"
+                    className={`bg-gray-900 border-2 border-transparent p-6 rounded-lg text-center transition-all duration-300 ease-in-out transform hover:-translate-y-2 shadow-md hover:shadow-lg ${
+                      item.points === 100
+                        ? "hover:border-red-600"
+                        : item.points === 50
+                        ? "hover:border-orange-400"
+                        : item.points === 10
+                        ? "hover:border-hacker-green"
+                        : "border-transparent"
+                    }`}
                     onClick={() =>
                       openChallengeDetails({
                         id: item.id,
@@ -391,13 +399,13 @@ export default function Home(props) {
             )}
 
             <div className="mt-4">
+              <p id="message" className="text-red-500 mb-2 font-orbitron"></p>
               <input
                 id="flag_input"
                 type="text"
                 placeholder="Enter flag here..."
                 className="border focus:border-none rounded px-3 focus:ring-hacker-green py-2 w-full mb-4 no-select"
               />
-              <p id="message" className="text-red-500 mt-2 font-orbitron"></p>
               <motion.button
                 onClick={solveChallenge}
                 whileHover={{ scale: 1.1 }}
