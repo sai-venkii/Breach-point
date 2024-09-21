@@ -2,6 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const Teams = require("../Models/Teams");
 const Challenges = require("../Models/Challenges");
+const solvedChallenges = require("../Models/SolvedChallenges");
 const router = express.Router();
 
 router.get("/score", async (req, res) => {
@@ -54,7 +55,13 @@ router.post("/submit/:id", async (req, res) => {
     }
     else{
       if (flag[0].flag === user_flag) {
-        const {points}=await Challenges.getScore(id);
+        let {points}=await Challenges.getScore(id);
+        const {usedHints} = await solvedChallenges.getAttemptedChallenge(team,id);
+        // console.log(usedHints);
+        for(let i=0;i<usedHints.length;i++){
+            points-=usedHints[i].pointsReduce;
+        }
+        // console.log(points);
         const updated_team=(await Teams.updateScore(team,points));
         res.status(200).json({
           status:"Solved",
@@ -63,6 +70,7 @@ router.post("/submit/:id", async (req, res) => {
         await Challenges.updateSolves(id);
         // console.log(updated_team);
         await Teams.addCompletedChallenge(team,id);
+        await solvedChallenges.markSolved(team,id);
       } else {
         res.status(202).json({message:"Incorrect Flag"});
       }

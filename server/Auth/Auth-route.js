@@ -29,7 +29,8 @@ router.post("/register", async (req, res) => {
         res.status(201).json({ message: "Team created successfully" });
 
     } catch (err) {
-        res.status(500).json({ message: "Internal Server Error", error: err.message });
+        console.log(err);
+        res.status(500).json({ message: "Team not created"});
     }
 });
 
