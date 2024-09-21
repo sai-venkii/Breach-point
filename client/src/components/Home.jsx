@@ -402,14 +402,14 @@ export default function Home(props) {
                 onClick={solveChallenge}
                 whileHover={{ scale: 1.1 }}
                 transition={{ type: "spring", stiffness: 300 }}
-                className="bg-hacker-green text-white px-4 py-2 rounded font-orbitron no-select mr-4"
+                className="bg-hacker-green text-white px-4 py-2 rounded font-orbitron font-bold no-select mr-4"
               >
                 Submit
               </motion.button>
 
               <motion.button
                 onClick={closeChallengeDetails}
-                className="bg-hacker-green text-white px-4 py-2 rounded font-orbitron no-select"
+                className="bg-hacker-green text-white px-4 py-2 rounded font-orbitron font-bold no-select"
                 whileHover={{ scale: 1.1 }}
                 transition={{ type: "spring", stiffness: 300 }}
               >
@@ -418,7 +418,7 @@ export default function Home(props) {
               {!hints[selectedChallenge.id] && (
                 <motion.button
                   onClick={promptForHint}
-                  className="bg-yellow-500 ml-3 text-white px-4 py-2 rounded font-orbitron no-select"
+                  className="bg-yellow-500 ml-3 text-white px-4 py-2 rounded font-orbitron font-bold no-select"
                   whileHover={{ scale: 1.1 }}
                   transition={{ type: "spring", stiffness: 300 }}
                 >
@@ -428,7 +428,7 @@ export default function Home(props) {
               <motion.a
                 href="http://localhost:8082/api/challenges/file" // Replace with actual file URL
                 download
-                className="bg-blue-500 ml-3 text-white px-5 py-[10px] rounded font-orbitron no-select"
+                className="bg-blue-500 ml-3 text-white px-5 py-[10px] rounded font-orbitron font-bold no-select"
                 whileHover={{ scale: 1.1 }}
                 transition={{ type: "spring", stiffness: 300 }}
               >
