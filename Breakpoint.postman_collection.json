@@ -1,0 +1,274 @@
+{
+	"info": {
+		"_postman_id": "46ee0762-d0db-4636-8a4f-d173e1067a1a",
+		"name": "Breakpoint",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "30336117"
+	},
+	"item": [
+		{
+			"name": "localhost:8082/auth/login",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"teamName\":\"test2\",\r\n    \"password\":\"test\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8082/auth/login",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:8082/auth/register",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"teamName\":\"test2\",\r\n    \"password\":\"test\",\r\n    \"email\":\"22pc04@psgtech.ac.in\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8082/auth/register",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"auth",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:8082/api/challenges",
+			"protocolProfileBehavior": {
+				"followRedirects": false
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8082/api/challenges",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"api",
+						"challenges"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:8082/api/challenges",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"challenge_name\":\"Decrypt Nayagan\",\r\n    \"challenge_description\": \"Key kandu pidi\",\r\n    \"points\":10,\r\n    \"hints\":[\r\n        {\r\n            \"id\":1,\r\n            \"hint\":\"Decrypt Nayagan oda hint\",\r\n            \"pointReduce\":2\r\n        },\r\n        {\r\n            \"id\":2,\r\n            \"hint\":\"Decrypt Nayagan oda hint 2\",\r\n            \"pointReduce\":3\r\n        },\r\n        \r\n        {\r\n            \"id\":3,\r\n            \"hint\":\"Decrypt Nayagan oda hint 3\",\r\n            \"pointReduce\":5\r\n        }\r\n    ],\r\n    \"category\":\"Crypto\",\r\n    \"connectionInfo\":\"https://www.youtube.com\",\r\n    \"flag\":\"TVK{CM2026}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8082/api/challenges",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"api",
+						"challenges"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/api/challenges/1/hint/2",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0ZWFtIjoidGVzdDIiLCJlbWFpbCI6IjIycGMwNEBwc2d0ZWNoLmFjLmluIiwiaWF0IjoxNzI2MjAxMzM1LCJleHAiOjE3MjYyMTkzMzV9.CjsQfm31EV1V59cE6AGWjcysrcVZhbjLF5asmK3WDf8",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8082/api/challenges/1/hint/1",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"api",
+						"challenges",
+						"1",
+						"hint",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:8082/api/challenges/1",
+			"protocolProfileBehavior": {
+				"followRedirects": false
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8082/api/challenges/1",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"api",
+						"challenges",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/api/team/submit/1",
+			"protocolProfileBehavior": {
+				"followRedirects": false
+			},
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"flag\":\"TVK{CM2026}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8082/api/team/submit/2",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"api",
+						"team",
+						"submit",
+						"2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "api/team/score",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8082/api/team/score",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"api",
+						"team",
+						"score"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/api/team/solved",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8082/api/team/solved",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"api",
+						"team",
+						"solved"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "inherit"
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}

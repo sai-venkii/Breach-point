@@ -3,11 +3,12 @@ const mongoose = require("mongoose");
 const Teams = require("../Models/Teams");
 const Challenges = require("../Models/Challenges");
 const solvedChallenges = require("../Models/SolvedChallenges");
+const authMiddleware = require("../Auth/Auth-middleware");
 const router = express.Router();
 
-router.get("/score", async (req, res) => {
-  const { team } = req.user;
+router.get("/score",authMiddleware, async (req, res) => {
   try {
+    const { team } = req.user;
     const score = (await Teams.getScore(team))[0];
     res.status(200).json(score);
   } catch (err) {
@@ -16,9 +17,9 @@ router.get("/score", async (req, res) => {
   }
 });
 
-router.get("/solved",async (req,res)=>{
-  const {team}=req.user;
+router.get("/solved",authMiddleware,async (req,res)=>{
   try{
+    const {team}=req.user;
     const teams=await Teams.getTeam(team);
     // console.log(teams);
     const challenges_solved=teams[0].solvedChallenges;
@@ -32,7 +33,7 @@ router.get("/solved",async (req,res)=>{
     })
   }
 })
-router.post("/submit/:id", async (req, res) => {
+router.post("/submit/:id", authMiddleware,async (req, res) => {
   try {
     const id = req.params.id;
     const user_flag =  req.body.flag;
