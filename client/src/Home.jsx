@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "./Home.css";
-import logo from "../assets/breachpoint.png";
+import logo from "./assets/breachpoint.png";
 import { motion } from "framer-motion";
 import axios from "axios";
 
@@ -8,10 +8,12 @@ export default function Home(props) {
   axios.defaults.withCredentials = true;
   const [data, setData] = useState(null);
   const [team, setTeam] = useState(null);
+  const [currentHintId, setCurrentHintId] = useState(null);
+  const [pointsReduce, setPointsReduce] = useState(0);
   const [isCompleted, setCompleted] = useState(false);
   const [selectedChallenge, setSelectedChallenge] = useState(null);
   const [hints, setHints] = useState({});
-  const [showHintPrompt, setShowHintPrompt] = useState(false); 
+  const [showHintPrompt, setShowHintPrompt] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -58,6 +60,7 @@ export default function Home(props) {
         category: fullChallenge.category,
         points: fullChallenge.points,
         description: fullChallenge.description,
+        hintCount: fullChallenge.hintCount,
       });
     } catch (error) {
       console.error("Error fetching challenge details:", error);
@@ -70,26 +73,45 @@ export default function Home(props) {
     setShowHintPrompt(false);
   };
 
-  const fetchHint = async (challengeId) => {
+  const fetchHint = async (challengeId, hintId) => {
     try {
       const response = await axios.get(
-        `http://localhost:8082/api/challenges/hint/${challengeId}`,
+        `http://localhost:8082/api/challenges/${challengeId}/hint/${hintId}`,
         { withCredentials: true }
       );
-      return response.data.hint; 
+      return response.data.hint;
     } catch (error) {
       console.error("Error fetching hint:", error);
       return null;
     }
   };
 
-  const promptForHint = async () => {
-    setShowHintPrompt(true);
+  const fetchPoint = async (challengeId, hintId) => {
+    try {
+      const response = await axios.get(
+        `http://localhost:8082/api/challenges/${challengeId}/hint/${hintId}`,
+        { withCredentials: true }
+      );
+      return response.data.pointReduce;
+    } catch (error) {
+      console.error("Error fetching hint:", error);
+      return null;
+    }
   };
+  
 
-  const handleHintDecision = async (useHint) => {
+  const promptForHint = async (hintId) => {
+    const hintData = await fetchPoint(selectedChallenge.id, hintId);
+    if (hintData) {
+      setCurrentHintId(hintId);
+      setPointsReduce(hintData);
+      setShowHintPrompt(true);
+    }
+  };
+  
+  const handleHintDecision = async (useHint, hintId) => {
     if (useHint) {
-      const fetchedHint = await fetchHint(selectedChallenge.id);
+      const fetchedHint = await fetchHint(selectedChallenge.id, hintId);
       if (fetchedHint) {
         setHints((prevHints) => ({
           ...prevHints,
@@ -102,7 +124,7 @@ export default function Home(props) {
         }));
       }
     }
-    setShowHintPrompt(false); 
+    setShowHintPrompt(false);
   };
 
   const solveChallenge = async () => {
@@ -299,6 +321,7 @@ export default function Home(props) {
                         category: item.category,
                         points: item.points,
                         description: item.description,
+                        hintCount: item.hintCount,
                       })
                     }
                     whileHover={{ scale: 1.05 }}
@@ -346,6 +369,9 @@ export default function Home(props) {
             <p className="mb-4 font-orbitron text-hacker-green no-select">
               Points: {selectedChallenge.points}
             </p>
+            <p className="mb-4 font-orbitron text-hacker-green no-select">
+              P : {selectedChallenge.hintCount}
+            </p>
 
             {hints[selectedChallenge.id] ? (
               <div>
@@ -377,12 +403,11 @@ export default function Home(props) {
                   exit={{ scale: 0.8, opacity: 0 }}
                 >
                   <p className="mb-4 text-yellow-500 font-orbitron">
-                    Are you sure you want to use a hint? It may affect your
-                    final score.
+                      Are you sure you want to use a hint? {pointsReduce} points will be reduced.
                   </p>
                   <div className="flex justify-between">
                     <button
-                      onClick={() => handleHintDecision(true)}
+                      onClick={() => handleHintDecision(true, currentHintId)} // Pass the current hint ID
                       className="bg-hacker-green text-white px-4 py-2 rounded font-orbitron no-select mr-4"
                     >
                       Yes, use hint
@@ -423,18 +448,8 @@ export default function Home(props) {
               >
                 Close
               </motion.button>
-              {!hints[selectedChallenge.id] && (
-                <motion.button
-                  onClick={promptForHint}
-                  className="bg-yellow-500 ml-3 text-white px-4 py-2 rounded font-orbitron font-bold no-select"
-                  whileHover={{ scale: 1.1 }}
-                  transition={{ type: "spring", stiffness: 300 }}
-                >
-                  Use Hint
-                </motion.button>
-              )}
               <motion.a
-                href="http://localhost:8082/api/challenges/file" // Replace with actual file URL
+                href="http://localhost:8082/api/challenges/file"
                 download
                 className="bg-blue-500 ml-3 text-white px-5 py-[10px] rounded font-orbitron font-bold no-select"
                 whileHover={{ scale: 1.1 }}
@@ -442,6 +457,22 @@ export default function Home(props) {
               >
                 File
               </motion.a>
+              {!hints[selectedChallenge.id] &&
+                selectedChallenge.hintCount > 0 && (
+                  <div>
+                    {[...Array(selectedChallenge.hintCount)].map((_, index) => (
+                      <motion.button
+                        key={index}
+                        onClick={() => promptForHint(index + 1)}
+                        className="bg-yellow-500 mt-3 mr-3 text-white px-4 py-2 rounded font-orbitron font-bold no-select"
+                        whileHover={{ scale: 1.1 }}
+                        transition={{ type: "spring", stiffness: 300 }}
+                      >
+                        Use Hint {index + 1}
+                      </motion.button>
+                    ))}
+                  </div>
+                )}
             </div>
           </motion.div>
         </motion.div>
