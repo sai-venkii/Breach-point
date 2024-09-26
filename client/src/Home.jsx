@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from "react";
 import "./Home.css";
 import logo from "./assets/breachpoint.png";
-import { motion } from "framer-motion";
 import axios from "axios";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function Home(props) {
   axios.defaults.withCredentials = true;
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertType, setAlertType] = useState("");
+  const [showAlert,setShowAlert] = useState(false);
   const [data, setData] = useState(null);
   const [team, setTeam] = useState(null);
   const [currentHintId, setCurrentHintId] = useState(null);
@@ -15,6 +18,16 @@ export default function Home(props) {
   const [hints, setHints] = useState({});
   const [showHintPrompt, setShowHintPrompt] = useState(false);
 
+  useEffect(() => {
+      if(alertMessage.length!=0){
+        setShowAlert(true);
+        const timer = setTimeout(() => {
+          setAlertMessage("");
+          setShowAlert(false);
+        }, 1500);
+        return () => clearTimeout(timer);
+      }
+  }, [alertMessage]);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -314,24 +327,39 @@ export default function Home(props) {
                         ? "hover:border-hacker-green"
                         : "border-transparent"
                     }`}
-                    onClick={() =>
-                      openChallengeDetails({
-                        id: item.id,
-                        name: item.name,
-                        category: item.category,
-                        points: item.points,
-                        description: item.description,
-                        hintCount: item.hintCount,
-                      })
+                    onClick={ async () =>{
+                      // try{
+                      try{
+                        const response = await axios.get('http://localhost:8082/api/team/solved')
+                        if(response.data.solved.includes(item.id)){
+                          setAlertMessage("Challenge Already Solved")
+                          setAlertType("error")
+                        }
+                        else{
+                          openChallengeDetails({
+                            id: item.id,
+                            name: item.name,
+                            category: item.category,
+                            points: item.points,
+                            description: item.description,
+                            hintCount: item.hintCount,
+                          })
+                        }
+                      }catch(err){
+                          console.log(err)
+                      }
                     }
-                    whileHover={{ scale: 1.05 }}
-                  >
+                  }>
+
+                                
+                       
                     <h3 className="text-xl cursor-pointer font-bold text-hacker-green mb-3">
                       {item.name}
                     </h3>
                     <p className="text-sm cursor-pointer text-gray-400">
                       {item.points} points
                     </p>
+                    
                   </motion.div>
                 ))}
             </motion.div>
@@ -477,6 +505,39 @@ export default function Home(props) {
           </motion.div>
         </motion.div>
       )}
+
+            {showAlert && (
+<AnimatePresence>
+  <div className="fixed top-0 left-0 right-0 flex justify-center z-50">
+    <motion.div
+      className={`flex items-center p-4 text-sm border rounded-lg mt-4 ${
+        alertType === "success"
+          ? "text-green-800 border-green-300 bg-green-50"
+          : "text-red-800 border-red-300 bg-red-50"
+      }`}
+      role="alert"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0, transition: { duration: 1 } }}
+    >
+      <svg
+        className="flex-shrink-0 inline w-4 h-4 me-3"
+        aria-hidden="true"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="currentColor"
+        viewBox="0 0 20 20"
+      >
+        <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
+      </svg>
+      <span className="sr-only">{alertType === "success" ? "Success" : "Error"}</span>
+      <div>
+        <span className="font-medium"></span> {alertMessage}
+      </div>
+    </motion.div>
+  </div>
+</AnimatePresence>
+
+        )}
     </>
   );
 }
