@@ -13,7 +13,7 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(
   cors({
-    origin: "*",
+    origin: "https://breach-point.onrender.com",
     credentials: true,
   })
 );
