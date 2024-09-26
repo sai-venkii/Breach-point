@@ -5,6 +5,7 @@ import axios from "axios";
 import Cookies from 'js-cookie'
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import API_BASE_URL from "./config";
 
 export default function Home(props) {
   axios.defaults.withCredentials = true;
@@ -35,7 +36,7 @@ export default function Home(props) {
     const fetchData = async () => {
       try {
         const Challengeresponse = await axios.get(
-          "http://localhost:8082/api/challenges",
+          `${API_BASE_URL}/api/challenges`,
           { withCredentials: true }
         );
         setData(Challengeresponse.data);
@@ -46,7 +47,7 @@ export default function Home(props) {
 
       try {
         const Teamresponse = await axios.get(
-          "http://localhost:8082/api/team/score",
+          `${API_BASE_URL}/api/team/score`,
           { withCredentials: true }
         );
         setTeam(Teamresponse.data);
@@ -62,14 +63,12 @@ export default function Home(props) {
   const openChallengeDetails = async (challenge) => {
     try {
       const response = await axios.get(
-        `http://localhost:8082/api/challenges/${challenge.id}`,
+        `${API_BASE_URL}/api/challenges/${challenge.id}`,
         {
           withCredentials: true,
         }
       );
-
-      const fullChallenge = response.data;
-
+      const fullChallenge = response.data
       setSelectedChallenge({
         id: fullChallenge.id,
         name: fullChallenge.name,
@@ -77,6 +76,7 @@ export default function Home(props) {
         points: fullChallenge.points,
         description: fullChallenge.description,
         hintCount: fullChallenge.hintCount,
+        files : fullChallenge.files,
       });
     } catch (error) {
       console.error("Error fetching challenge details:", error);
@@ -92,7 +92,7 @@ export default function Home(props) {
   const fetchHint = async (challengeId, hintId) => {
     try {
       const response = await axios.get(
-        `http://localhost:8082/api/challenges/${challengeId}/hint/${hintId}`,
+        `${API_BASE_URL}/api/challenges/${challengeId}/hint/${hintId}`,
         { withCredentials: true }
       );
       return response.data.hint;
@@ -105,7 +105,7 @@ export default function Home(props) {
   const fetchPoint = async (challengeId, hintId) => {
     try {
       const response = await axios.get(
-        `http://localhost:8082/api/challenges/${challengeId}/hint/${hintId}`,
+        `${API_BASE_URL}/api/challenges/${challengeId}/hint/${hintId}`,
         { withCredentials: true }
       );
       return response.data.pointReduce;
@@ -150,7 +150,7 @@ export default function Home(props) {
     if (flag.length !== 0) {
       try {
         const response = await axios.post(
-          `http://localhost:8082/api/team/submit/${selectedChallenge.id}`,
+          `${API_BASE_URL}/api/team/submit/${selectedChallenge.id}`,
           {
             flag: flag,
           }
@@ -337,7 +337,7 @@ export default function Home(props) {
                     onClick={ async () =>{
                       // try{
                       try{
-                        const response = await axios.get('http://localhost:8082/api/team/solved')
+                        const response = await axios.get(`${API_BASE_URL}/api/team/solved`)
                         if(response.data.solved.includes(item.id)){
                           setAlertMessage("Challenge Already Solved")
                           setAlertType("error")
@@ -484,8 +484,7 @@ export default function Home(props) {
                 Close
               </motion.button>
               <motion.a
-                href="http://localhost:8082/api/challenges/file"
-                download
+                href={selectedChallenge.files}
                 className="bg-blue-500 ml-3 text-white px-5 py-[10px] rounded font-orbitron font-bold no-select"
                 whileHover={{ scale: 1.1 }}
                 transition={{ type: "spring", stiffness: 300 }}
