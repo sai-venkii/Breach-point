@@ -1,11 +1,17 @@
 import React, { useEffect, useState } from "react";
 import "./Home.css";
 import logo from "./assets/breachpoint.png";
-import { motion } from "framer-motion";
 import axios from "axios";
+import Cookies from 'js-cookie'
+import { motion, AnimatePresence } from "framer-motion";
+import { useNavigate } from "react-router-dom";
+import API_BASE_URL from "./config";
 
 export default function Home(props) {
   axios.defaults.withCredentials = true;
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertType, setAlertType] = useState("");
+  const [showAlert,setShowAlert] = useState(false);
   const [data, setData] = useState(null);
   const [team, setTeam] = useState(null);
   const [currentHintId, setCurrentHintId] = useState(null);
@@ -14,29 +20,40 @@ export default function Home(props) {
   const [selectedChallenge, setSelectedChallenge] = useState(null);
   const [hints, setHints] = useState({});
   const [showHintPrompt, setShowHintPrompt] = useState(false);
+  const navigate = useNavigate()
 
+  useEffect(() => {
+      if(alertMessage.length!=0){
+        setShowAlert(true);
+        const timer = setTimeout(() => {
+          setAlertMessage("");
+          setShowAlert(false);
+        }, 1500);
+        return () => clearTimeout(timer);
+      }
+  }, [alertMessage]);
   useEffect(() => {
     const fetchData = async () => {
       try {
         const Challengeresponse = await axios.get(
-          "http://localhost:8082/api/challenges",
+          `${API_BASE_URL}/api/challenges`,
           { withCredentials: true }
         );
-        console.log("Data:", Challengeresponse.data);
         setData(Challengeresponse.data);
       } catch (error) {
         console.error("Error fetching data:", error);
+        navigate('/login')
       }
 
       try {
         const Teamresponse = await axios.get(
-          "http://localhost:8082/api/team/score",
+          `${API_BASE_URL}/api/team/score`,
           { withCredentials: true }
         );
-        console.log("Data:", Teamresponse.data);
         setTeam(Teamresponse.data);
       } catch (error) {
         console.error("Error fetching data:", error);
+        navigate('/login')
       }
     };
 
@@ -46,14 +63,12 @@ export default function Home(props) {
   const openChallengeDetails = async (challenge) => {
     try {
       const response = await axios.get(
-        `http://localhost:8082/api/challenges/${challenge.id}`,
+        `${API_BASE_URL}/api/challenges/${challenge.id}`,
         {
           withCredentials: true,
         }
       );
-
-      const fullChallenge = response.data;
-
+      const fullChallenge = response.data
       setSelectedChallenge({
         id: fullChallenge.id,
         name: fullChallenge.name,
@@ -61,6 +76,7 @@ export default function Home(props) {
         points: fullChallenge.points,
         description: fullChallenge.description,
         hintCount: fullChallenge.hintCount,
+        files : fullChallenge.files,
       });
     } catch (error) {
       console.error("Error fetching challenge details:", error);
@@ -76,7 +92,7 @@ export default function Home(props) {
   const fetchHint = async (challengeId, hintId) => {
     try {
       const response = await axios.get(
-        `http://localhost:8082/api/challenges/${challengeId}/hint/${hintId}`,
+        `${API_BASE_URL}/api/challenges/${challengeId}/hint/${hintId}`,
         { withCredentials: true }
       );
       return response.data.hint;
@@ -89,7 +105,7 @@ export default function Home(props) {
   const fetchPoint = async (challengeId, hintId) => {
     try {
       const response = await axios.get(
-        `http://localhost:8082/api/challenges/${challengeId}/hint/${hintId}`,
+        `${API_BASE_URL}/api/challenges/${challengeId}/hint/${hintId}`,
         { withCredentials: true }
       );
       return response.data.pointReduce;
@@ -134,7 +150,7 @@ export default function Home(props) {
     if (flag.length !== 0) {
       try {
         const response = await axios.post(
-          `http://localhost:8082/api/team/submit/${selectedChallenge.id}`,
+          `${API_BASE_URL}/api/team/submit/${selectedChallenge.id}`,
           {
             flag: flag,
           }
@@ -234,7 +250,11 @@ export default function Home(props) {
 
           {/* Right section: Sign Out */}
           <motion.a
-            href="/login"
+            onClick={()=>{
+              Cookies.remove('auth'); // Remove the 'auth' cookie
+              localStorage.removeItem('auth')
+              window.location.href = "/login"; // Redirect to login page
+            }}
             className="block px-3 mt-2 font-bold text-xl text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-hacker-green md:p-0 md:dark:hover:text-hacker-green dark:text-hacker-green dark:hover:bg-gray-700 dark:hover:text-hacker-green md:dark:hover:bg-transparent dark:border-gray-700 font-orbitron no-select"
             whileHover={{ scale: 1.1, transition: { duration: 0.3 } }}
           >
@@ -314,24 +334,39 @@ export default function Home(props) {
                         ? "hover:border-hacker-green"
                         : "border-transparent"
                     }`}
-                    onClick={() =>
-                      openChallengeDetails({
-                        id: item.id,
-                        name: item.name,
-                        category: item.category,
-                        points: item.points,
-                        description: item.description,
-                        hintCount: item.hintCount,
-                      })
+                    onClick={ async () =>{
+                      // try{
+                      try{
+                        const response = await axios.get(`${API_BASE_URL}/api/team/solved`)
+                        if(response.data.solved.includes(item.id)){
+                          setAlertMessage("Challenge Already Solved")
+                          setAlertType("error")
+                        }
+                        else{
+                          openChallengeDetails({
+                            id: item.id,
+                            name: item.name,
+                            category: item.category,
+                            points: item.points,
+                            description: item.description,
+                            hintCount: item.hintCount,
+                          })
+                        }
+                      }catch(err){
+                          console.log(err)
+                      }
                     }
-                    whileHover={{ scale: 1.05 }}
-                  >
+                  }>
+
+                                
+                       
                     <h3 className="text-xl cursor-pointer font-bold text-hacker-green mb-3">
                       {item.name}
                     </h3>
                     <p className="text-sm cursor-pointer text-gray-400">
                       {item.points} points
                     </p>
+                    
                   </motion.div>
                 ))}
             </motion.div>
@@ -449,8 +484,7 @@ export default function Home(props) {
                 Close
               </motion.button>
               <motion.a
-                href="http://localhost:8082/api/challenges/file"
-                download
+                href={selectedChallenge.files}
                 className="bg-blue-500 ml-3 text-white px-5 py-[10px] rounded font-orbitron font-bold no-select"
                 whileHover={{ scale: 1.1 }}
                 transition={{ type: "spring", stiffness: 300 }}
@@ -477,6 +511,39 @@ export default function Home(props) {
           </motion.div>
         </motion.div>
       )}
+
+            {showAlert && (
+<AnimatePresence>
+  <div className="fixed top-0 left-0 right-0 flex justify-center z-50">
+    <motion.div
+      className={`flex items-center p-4 text-sm border rounded-lg mt-4 ${
+        alertType === "success"
+          ? "text-green-800 border-green-300 bg-green-50"
+          : "text-red-800 border-red-300 bg-red-50"
+      }`}
+      role="alert"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0, transition: { duration: 1 } }}
+    >
+      <svg
+        className="flex-shrink-0 inline w-4 h-4 me-3"
+        aria-hidden="true"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="currentColor"
+        viewBox="0 0 20 20"
+      >
+        <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
+      </svg>
+      <span className="sr-only">{alertType === "success" ? "Success" : "Error"}</span>
+      <div>
+        <span className="font-medium"></span> {alertMessage}
+      </div>
+    </motion.div>
+  </div>
+</AnimatePresence>
+
+        )}
     </>
   );
 }

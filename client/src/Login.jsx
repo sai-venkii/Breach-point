@@ -4,6 +4,7 @@ import MatrixEffect from "./components/MatrixEffect";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import API_BASE_URL from "./config";
 
 const validatePassword = (password) => ({
   length: password.length >= 8,
@@ -71,7 +72,7 @@ const Login = () => {
       return;
     }
 
-    const url = isRegister ? 'http://localhost:8082/auth/register' : 'http://localhost:8082/auth/login';
+    const url = isRegister ? `${API_BASE_URL}/auth/register` : `${API_BASE_URL}/auth/login`;
     const data = {
       teamName,
       password,
