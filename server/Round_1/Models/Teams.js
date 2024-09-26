@@ -66,6 +66,10 @@ teamModels.statics.addCompletedChallenge=async function(team,challenge_id){
     }
   },{new:true});
 }
+teamModels.statics.getPassword=async function(team) {
+  const res= await this.findOne({name:team},'password -_id');
+  return res;
+}
 
 const Teams = mongoose.model("Teams", teamModels);
 module.exports = Teams;

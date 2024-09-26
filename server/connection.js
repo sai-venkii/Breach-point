@@ -5,7 +5,7 @@ const Db_connect=async ()=>{
         `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@cluster0.khcbk.mongodb.net/ctf?retryWrites=true&w=majority&appName=Cluster0`
         )
         .then(()=> {
-            console.log('Connected to Mongodb');
+            console.log('Mongo Round 1 connected');
         })
         .catch(error => { console.error(error) });
 }
