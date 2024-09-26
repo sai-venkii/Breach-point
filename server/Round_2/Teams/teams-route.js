@@ -54,6 +54,25 @@ router.post("/submit", authMiddleware, async (req, res) => {
     });
   }
 });
+router.get("/score",authMiddleware,async(req,res)=>{
+  try{
+    const {team} = req.user;
+    const db_team=await Teams.findOne({name:team},"-_id -__v");
+    if(db_team){
+      return res.status(200).json({
+        score:db_team.points
+      })
+    }
+    res.status(201).json({
+      message:"Could not fetch team score"
+    })
+  }catch(err){
+    console.log(err);
+    res.status(500).json({
+      message:"Error getting team Score"
+    })
+  }
+})
 router.post("/addteam", async (req, res) => {
   try {
     const { name, machine_name } = req.body;
