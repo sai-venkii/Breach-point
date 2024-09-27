@@ -12,10 +12,7 @@ const app = express();
 app.use(cookieParser());
 app.use(express.json());
 app.use(
-  cors({
-    origin: "*",
-    credentials: true,
-  })
+  cors()
 );
 require("dotenv").config();
 
