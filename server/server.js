@@ -13,7 +13,7 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(
   cors({
-    origin: "https://breach-point.vercel.app",
+    origin: ["https://breach-point.vercel.app"],
     credentials:true
   })
 );
