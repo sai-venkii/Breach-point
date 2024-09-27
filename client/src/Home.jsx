@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import "./Home.css";
 import logo from "./assets/breachpoint.png";
 import axios from "axios";
-import Cookies from 'js-cookie'
+// import Cookies from 'js-cookie';
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import API_BASE_URL from "./config";
@@ -326,11 +326,11 @@ export default function Home(props) {
                   <motion.div
                     key={item.id}
                     className={`bg-gray-900 border-2 border-transparent p-6 rounded-lg text-center transition-all duration-300 ease-in-out transform hover:-translate-y-2 shadow-md hover:shadow-lg ${
-                      item.points === 100
+                      item.points > 250
                         ? "hover:border-red-600"
-                        : item.points === 50
+                        : item.points > 100 && item.points <= 250
                         ? "hover:border-orange-400"
-                        : item.points === 10
+                        : item.points <= 100
                         ? "hover:border-hacker-green"
                         : "border-transparent"
                     }`}
@@ -403,9 +403,6 @@ export default function Home(props) {
             </p>
             <p className="mb-4 font-orbitron text-hacker-green no-select">
               Points: {selectedChallenge.points}
-            </p>
-            <p className="mb-4 font-orbitron text-hacker-green no-select">
-              P : {selectedChallenge.hintCount}
             </p>
 
             {hints[selectedChallenge.id] ? (

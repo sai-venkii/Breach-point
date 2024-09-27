@@ -2,8 +2,7 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import MatrixEffect from "./components/MatrixEffect";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
-import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import { useNavigate } from "react-router-dom"; 
 import API_BASE_URL from "./config";
 
 const validatePassword = (password) => ({
@@ -184,14 +183,14 @@ const Login = () => {
               exit="exit"
             >
               <input
-                placeholder="Team Name"
+                placeholder="TeamName"
                 className="peer outline-none ring border-0 font-inter rounded-lg ring-gray-200 text-black duration-500 focus:ring-2 focus:border-gray-100 relative placeholder:duration-500 placeholder:absolute focus:placeholder:pt-10 shadow-xl shadow-gray-400/10 focus:shadow-none focus:rounded-md focus:ring-hacker-green placeholder:text-black"
                 type="text"
                 value={teamName}
                 onChange={(e) => setTeamName(e.target.value)}
               />
               <span className="duration-500 opacity-0 peer-focus:opacity-100 text-hacker-green text-xs -translate-y-12 peer-focus:-translate-y-1">
-                Team Name
+                TeamName
               </span>
             </motion.div>
 

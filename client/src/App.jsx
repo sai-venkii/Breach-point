@@ -5,6 +5,7 @@ import viteLogo from '/vite.svg'
 import Home from './Home'
 import Login from './Login'
 import Round2 from './Round2';
+import LoginR2 from './LoginR2';
 
 function App() {
 
@@ -13,7 +14,8 @@ function App() {
       <Routes>
         <Route path='/login' element={<Login/>}/>
         <Route path='/' element={<Home/>}/>
-        <Route path='/a' element={<Round2/>}/>
+        <Route path='/round2' element={<Round2/>}/>
+        <Route path='/round2/login' element={<LoginR2/>}/>
       </Routes>
     </Router>
   )
