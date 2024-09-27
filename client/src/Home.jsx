@@ -11,26 +11,27 @@ export default function Home(props) {
   axios.defaults.withCredentials = true;
   const [alertMessage, setAlertMessage] = useState("");
   const [alertType, setAlertType] = useState("");
-  const [showAlert,setShowAlert] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
   const [data, setData] = useState(null);
   const [team, setTeam] = useState(null);
   const [currentHintId, setCurrentHintId] = useState(null);
   const [pointsReduce, setPointsReduce] = useState(0);
+  const [usedHints, setUsedHints] = useState(new Set());
   const [isCompleted, setCompleted] = useState(false);
   const [selectedChallenge, setSelectedChallenge] = useState(null);
-  const [hints, setHints] = useState({});
+  const [hints, setHints] = useState([]); // Change to an array
   const [showHintPrompt, setShowHintPrompt] = useState(false);
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   useEffect(() => {
-      if(alertMessage.length!=0){
-        setShowAlert(true);
-        const timer = setTimeout(() => {
-          setAlertMessage("");
-          setShowAlert(false);
-        }, 1500);
-        return () => clearTimeout(timer);
-      }
+    if (alertMessage.length != 0) {
+      setShowAlert(true);
+      const timer = setTimeout(() => {
+        setAlertMessage("");
+        setShowAlert(false);
+      }, 1500);
+      return () => clearTimeout(timer);
+    }
   }, [alertMessage]);
   useEffect(() => {
     const fetchData = async () => {
@@ -42,18 +43,17 @@ export default function Home(props) {
         setData(Challengeresponse.data);
       } catch (error) {
         console.error("Error fetching data:", error);
-        navigate('/login')
+        navigate("/login");
       }
 
       try {
-        const Teamresponse = await axios.get(
-          `${API_BASE_URL}/api/team/score`,
-          { withCredentials: true }
-        );
+        const Teamresponse = await axios.get(`${API_BASE_URL}/api/team/score`, {
+          withCredentials: true,
+        });
         setTeam(Teamresponse.data);
       } catch (error) {
         console.error("Error fetching data:", error);
-        navigate('/login')
+        navigate("/login");
       }
     };
 
@@ -68,7 +68,7 @@ export default function Home(props) {
           withCredentials: true,
         }
       );
-      const fullChallenge = response.data
+      const fullChallenge = response.data;
       setSelectedChallenge({
         id: fullChallenge.id,
         name: fullChallenge.name,
@@ -76,7 +76,7 @@ export default function Home(props) {
         points: fullChallenge.points,
         description: fullChallenge.description,
         hintCount: fullChallenge.hintCount,
-        files : fullChallenge.files,
+        files: fullChallenge.files,
       });
     } catch (error) {
       console.error("Error fetching challenge details:", error);
@@ -114,7 +114,6 @@ export default function Home(props) {
       return null;
     }
   };
-  
 
   const promptForHint = async (hintId) => {
     const hintData = await fetchPoint(selectedChallenge.id, hintId);
@@ -122,23 +121,20 @@ export default function Home(props) {
       setCurrentHintId(hintId);
       setPointsReduce(hintData);
       setShowHintPrompt(true);
+
+      // Mark this hint as used
+      setUsedHints((prevUsedHints) => new Set(prevUsedHints).add(hintId));
     }
   };
-  
+
   const handleHintDecision = async (useHint, hintId) => {
     if (useHint) {
       const fetchedHint = await fetchHint(selectedChallenge.id, hintId);
-      if (fetchedHint) {
-        setHints((prevHints) => ({
-          ...prevHints,
-          [selectedChallenge.id]: fetchedHint,
-        }));
-      } else {
-        setHints((prevHints) => ({
-          ...prevHints,
-          [selectedChallenge.id]: "Hint could not be fetched.",
-        }));
-      }
+      setHints((prevHints) => {
+        const newHints = [...prevHints]; // Create a copy of the previous hints
+        newHints[hintId - 1] = fetchedHint; // Store the hint at the corresponding index
+        return newHints;
+      });
     }
     setShowHintPrompt(false);
   };
@@ -250,9 +246,9 @@ export default function Home(props) {
 
           {/* Right section: Sign Out */}
           <motion.a
-            onClick={()=>{
-              Cookies.remove('auth'); // Remove the 'auth' cookie
-              localStorage.removeItem('auth')
+            onClick={() => {
+              Cookies.remove("auth"); // Remove the 'auth' cookie
+              localStorage.removeItem("auth");
               navigate("/login");
             }}
             className="block px-3 mt-2 font-bold text-xl text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-hacker-green md:p-0 md:dark:hover:text-hacker-green dark:text-hacker-green dark:hover:bg-gray-700 dark:hover:text-hacker-green md:dark:hover:bg-transparent dark:border-gray-700 font-orbitron no-select"
@@ -334,15 +330,16 @@ export default function Home(props) {
                         ? "hover:border-hacker-green"
                         : "border-transparent"
                     }`}
-                    onClick={ async () =>{
+                    onClick={async () => {
                       // try{
-                      try{
-                        const response = await axios.get(`${API_BASE_URL}/api/team/solved`)
-                        if(response.data.solved.includes(item.id)){
-                          setAlertMessage("Challenge Already Solved")
-                          setAlertType("error")
-                        }
-                        else{
+                      try {
+                        const response = await axios.get(
+                          `${API_BASE_URL}/api/team/solved`
+                        );
+                        if (response.data.solved.includes(item.id)) {
+                          setAlertMessage("Challenge Already Solved");
+                          setAlertType("error");
+                        } else {
                           openChallengeDetails({
                             id: item.id,
                             name: item.name,
@@ -350,23 +347,19 @@ export default function Home(props) {
                             points: item.points,
                             description: item.description,
                             hintCount: item.hintCount,
-                          })
+                          });
                         }
-                      }catch(err){
-                          console.log(err)
+                      } catch (err) {
+                        console.log(err);
                       }
-                    }
-                  }>
-
-                                
-                       
+                    }}
+                  >
                     <h3 className="text-xl cursor-pointer font-bold text-hacker-green mb-3">
                       {item.name}
                     </h3>
                     <p className="text-sm cursor-pointer text-gray-400">
                       {item.points} points
                     </p>
-                    
                   </motion.div>
                 ))}
             </motion.div>
@@ -405,13 +398,18 @@ export default function Home(props) {
               Points: {selectedChallenge.points}
             </p>
 
-            {hints[selectedChallenge.id] ? (
-              <div>
-                <p className="mb-4 font-orbitron text-orange-500 no-select">
-                  Hint: {hints[selectedChallenge.id]}
-                </p>
+              {/* Hints section */}
+              <div className="mt-6">
+                <h3 className="text-xl font-bold text-white mb-3">
+                  Hints ({hints.length}/{selectedChallenge.hintCount} used)
+                </h3>
+
+                {hints.map((hint, index) => (
+                  <p key={index} className="hint-text font-orbitron text-orange-500 mb-2">
+                    Hint {index + 1}: {hint || "Hint not used yet."}
+                  </p>
+                ))}
               </div>
-            ) : null}
 
             {showHintPrompt && (
               <motion.div
@@ -435,7 +433,8 @@ export default function Home(props) {
                   exit={{ scale: 0.8, opacity: 0 }}
                 >
                   <p className="mb-4 text-yellow-500 font-orbitron">
-                      Are you sure you want to use a hint? {pointsReduce} points will be reduced.
+                    Are you sure you want to use a hint? {pointsReduce} points
+                    will be reduced.
                   </p>
                   <div className="flex justify-between">
                     <button
@@ -491,17 +490,22 @@ export default function Home(props) {
               {!hints[selectedChallenge.id] &&
                 selectedChallenge.hintCount > 0 && (
                   <div>
-                    {[...Array(selectedChallenge.hintCount)].map((_, index) => (
-                      <motion.button
-                        key={index}
-                        onClick={() => promptForHint(index + 1)}
-                        className="bg-yellow-500 mt-3 mr-3 text-white px-4 py-2 rounded font-orbitron font-bold no-select"
-                        whileHover={{ scale: 1.1 }}
-                        transition={{ type: "spring", stiffness: 300 }}
-                      >
-                        Use Hint {index + 1}
-                      </motion.button>
-                    ))}
+                    {[...Array(selectedChallenge.hintCount)].map((_, index) => {
+                      const hintId = index + 1;
+                      return (
+                        !usedHints.has(hintId) && ( // Only render if this hint hasn't been used
+                          <motion.button
+                            key={index}
+                            onClick={() => promptForHint(hintId)}
+                            className="bg-yellow-500 mt-3 mr-3 text-white px-4 py-2 rounded font-orbitron font-bold no-select"
+                            whileHover={{ scale: 1.1 }}
+                            transition={{ type: "spring", stiffness: 300 }}
+                          >
+                            Use Hint {hintId}
+                          </motion.button>
+                        )
+                      );
+                    })}
                   </div>
                 )}
             </div>
@@ -509,38 +513,39 @@ export default function Home(props) {
         </motion.div>
       )}
 
-            {showAlert && (
-<AnimatePresence>
-  <div className="fixed top-0 left-0 right-0 flex justify-center z-50">
-    <motion.div
-      className={`flex items-center p-4 text-sm border rounded-lg mt-4 ${
-        alertType === "success"
-          ? "text-green-800 border-green-300 bg-green-50"
-          : "text-red-800 border-red-300 bg-red-50"
-      }`}
-      role="alert"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0, transition: { duration: 1 } }}
-    >
-      <svg
-        className="flex-shrink-0 inline w-4 h-4 me-3"
-        aria-hidden="true"
-        xmlns="http://www.w3.org/2000/svg"
-        fill="currentColor"
-        viewBox="0 0 20 20"
-      >
-        <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
-      </svg>
-      <span className="sr-only">{alertType === "success" ? "Success" : "Error"}</span>
-      <div>
-        <span className="font-medium"></span> {alertMessage}
-      </div>
-    </motion.div>
-  </div>
-</AnimatePresence>
-
-        )}
+      {showAlert && (
+        <AnimatePresence>
+          <div className="fixed top-0 left-0 right-0 flex justify-center z-50">
+            <motion.div
+              className={`flex items-center p-4 text-sm border rounded-lg mt-4 ${
+                alertType === "success"
+                  ? "text-green-800 border-green-300 bg-green-50"
+                  : "text-red-800 border-red-300 bg-red-50"
+              }`}
+              role="alert"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0, transition: { duration: 1 } }}
+            >
+              <svg
+                className="flex-shrink-0 inline w-4 h-4 me-3"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
+              </svg>
+              <span className="sr-only">
+                {alertType === "success" ? "Success" : "Error"}
+              </span>
+              <div>
+                <span className="font-medium"></span> {alertMessage}
+              </div>
+            </motion.div>
+          </div>
+        </AnimatePresence>
+      )}
     </>
   );
 }

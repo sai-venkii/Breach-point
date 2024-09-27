@@ -14,6 +14,7 @@ app.use(express.json());
 app.use(
   cors({
     origin: "https://breach-point.vercel.app",
+    // origin: "http://localhost:5173",
     credentials:true
   })
 );
@@ -30,4 +31,3 @@ app.use("/api/round_2/challenges",round_2_challengeRoute);
 app.listen(PORT, () => {
   console.log(`Server running at ${PORT}`);
 });
-//site work aaguthu
