@@ -2,55 +2,53 @@ import React from 'react'
 import { useEffect, useState } from "react";
 import "./Home.css";
 import logo from "./assets/breachpoint.png";
-import { motion } from "framer-motion";
+import { motion ,AnimatePresence } from "framer-motion";
 import axios from "axios";
-
+import API_BASE_URL from './config';
 function Round2() {
     axios.defaults.withCredentials = true;
+    const [alertMessage, setAlertMessage] = useState("");
+    const [alertType, setAlertType] = useState("");
+    const [showAlert,setShowAlert] = useState(false);
     const [data, setData] = useState(null);
     const [team, setTeam] = useState(null);
     const [inputFlag, setInputFlag] = useState("");
     const [correctFlags, setCorrectFlags] = useState([]);
     const [totalFlags] = useState(20); 
-  
     useEffect(() => {
-      const fetchData = async () => {
-        try {
-          const Challengeresponse = await axios.get(
-            "http://localhost:8082/api/challenges",
-            { withCredentials: true }
-          );
-          console.log("Data:", Challengeresponse.data);
-          setData(Challengeresponse.data);
-        } catch (error) {
-          console.error("Error fetching data:", error);
-        }
-  
-        try {
-          const Teamresponse = await axios.get(
-            "http://localhost:8082/api/team/score",
-            { withCredentials: true }
-          );
-          console.log("Data:", Teamresponse.data);
-          setTeam(Teamresponse.data);
-        } catch (error) {
-          console.error("Error fetching data:", error);
-        }
-      };
-  
-      fetchData();
-    }, []);
-
-    const handleFlagSubmit = (e) => {
+      if(alertMessage.length!=0){
+        setShowAlert(true);
+        const timer = setTimeout(() => {
+          setAlertMessage("");
+          setShowAlert(false);
+        }, 1500);
+        return () => clearTimeout(timer);
+      }
+  }, [alertMessage]);
+    const handleFlagSubmit = async (e) => {
         e.preventDefault();
-
-        const correctFlagList = ["flag1", "flag2", "flag3", /* and so on until 20 flags */];
-
-        if (correctFlagList.includes(inputFlag) && !correctFlags.includes(inputFlag)) {
-            setCorrectFlags((prevFlags) => [...prevFlags, inputFlag]);
+        if(inputFlag.length == 0){
+          setAlertMessage("Please enter a flag");
+          setAlertType("error")
         }
-        
-        setInputFlag("");
+        else{
+          try{
+            const response = await axios.post(`${API_BASE_URL}/api/round_2/submit`,{
+              flag:inputFlag,
+            })
+            if(response.status == 200){
+              setAlertMessage(response.data.message)
+              setAlertType("success")
+            }
+            else{
+              setAlertMessage(response.data.message)
+              setAlertType("error")
+            }
+          }catch(err){
+            setAlertMessage(err)
+            setAlertType("error")
+          }
+        }
     };
 
     const navVariants = {
@@ -181,6 +179,38 @@ function Round2() {
                     Progress: {correctFlags.length}/{totalFlags}
                 </motion.p>
             </div>
+            {showAlert && (
+<AnimatePresence>
+  <div className="fixed top-0 left-0 right-0 flex justify-center z-50">
+    <motion.div
+      className={`flex items-center p-4 text-sm border rounded-lg mt-4 ${
+        alertType === "success"
+          ? "text-green-800 border-green-300 bg-green-50"
+          : "text-red-800 border-red-300 bg-red-50"
+      }`}
+      role="alert"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0, transition: { duration: 1 } }}
+    >
+      <svg
+        className="flex-shrink-0 inline w-4 h-4 me-3"
+        aria-hidden="true"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="currentColor"
+        viewBox="0 0 20 20"
+      >
+        <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
+      </svg>
+      <span className="sr-only">{alertType === "success" ? "Success" : "Error"}</span>
+      <div>
+        <span className="font-medium"></span> {alertMessage}
+      </div>
+    </motion.div>
+  </div>
+</AnimatePresence>
+
+        )}
     </>
 )}
 
