@@ -253,7 +253,7 @@ export default function Home(props) {
             onClick={()=>{
               Cookies.remove('auth'); // Remove the 'auth' cookie
               localStorage.removeItem('auth')
-              window.location.href = "/login"; // Redirect to login page
+              navigate("/login");
             }}
             className="block px-3 mt-2 font-bold text-xl text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-hacker-green md:p-0 md:dark:hover:text-hacker-green dark:text-hacker-green dark:hover:bg-gray-700 dark:hover:text-hacker-green md:dark:hover:bg-transparent dark:border-gray-700 font-orbitron no-select"
             whileHover={{ scale: 1.1, transition: { duration: 0.3 } }}
