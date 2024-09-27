@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import "./Home.css";
 import logo from "./assets/breachpoint.png";
 import axios from "axios";
-// import Cookies from 'js-cookie';
+import Cookies from 'js-cookie';
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import API_BASE_URL from "./config";
