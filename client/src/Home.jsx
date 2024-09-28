@@ -492,6 +492,7 @@ export default function Home(props) {
               >
                 File
               </motion.a>
+              }
               {hints.filter(elt=>elt.challengeId==selectedChallenge.id).length<selectedChallenge.hintCount &&
                  (
                   <div>
