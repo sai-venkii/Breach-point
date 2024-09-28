@@ -190,7 +190,7 @@ export default function Home(props) {
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.7, ease: "easeInOut" },
+      transition: { duration: 0.5, ease: "easeInOut" },
     },
     exit: { opacity: 0, y: 20 },
   };
@@ -200,7 +200,7 @@ export default function Home(props) {
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.7, ease: "easeInOut" },
+      transition: { duration: 0.5, ease: "easeInOut" },
     },
     exit: { opacity: 0, y: 20 },
   };
@@ -210,7 +210,7 @@ export default function Home(props) {
     visible: {
       opacity: 1,
       x: 0,
-      transition: { duration: 0.5, delay: 0.7, ease: "easeOut" },
+      transition: { duration: 0.5, delay: 0.2, ease: "easeOut" },
     },
   };
 
@@ -219,7 +219,7 @@ export default function Home(props) {
     visible: {
       opacity: 1,
       x: 0,
-      transition: { duration: 0.5, delay: 1, ease: "easeOut" },
+      transition: { duration: 0.5, delay: 0.2, ease: "easeOut" },
     },
   };
 
