@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import "./Home.css";
 import logo from "./assets/breachpoint.png";
 import axios from "axios";
-import Cookies from 'js-cookie';
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import API_BASE_URL from "./config";
@@ -246,14 +245,15 @@ export default function Home(props) {
 
           {/* Right section: Sign Out */}
           <motion.a
-            onClick={() => {
-              Cookies.remove("auth",{
-                sameSite : "None",
-                secure: true,
-                domain : "breach-point-backend.onrender.com",
-              }); // Remove the 'auth' cookie
-              localStorage.removeItem("auth");
-              navigate("/login");
+            onClick={async () => {
+              try{
+                const logout = await axios.get(`${API_BASE_URL}/auth/logout`);
+                if(logout.status == 200){
+                  navigate('/login')
+                }
+              }catch(err){
+                console.error(err);
+              }
             }}
             className="block px-3 mt-2 font-bold text-xl text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-hacker-green md:p-0 md:dark:hover:text-hacker-green dark:text-hacker-green dark:hover:bg-gray-700 dark:hover:text-hacker-green md:dark:hover:bg-transparent dark:border-gray-700 font-orbitron no-select"
             whileHover={{ scale: 1.1, transition: { duration: 0.3 } }}
