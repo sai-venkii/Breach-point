@@ -249,7 +249,8 @@ export default function Home(props) {
             onClick={() => {
               Cookies.remove("auth",{
                 sameSite : "None",
-                secure: true
+                secure: true,
+                domain : breach-point-backend.onrender.com,
               }); // Remove the 'auth' cookie
               localStorage.removeItem("auth");
               navigate("/login");
