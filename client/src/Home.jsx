@@ -153,8 +153,10 @@ export default function Home(props) {
 
         if (response.data.message === "Already Solved!!") {
           message.innerHTML = "This challenge has already been solved!";
+          message.className = "text-green-500 mb-2 font-orbitron";
         } else if (response.data.status === "Solved") {
           message.innerHTML = "Correct flag! Challenge solved.";
+          message.className = "text-green-500 mb-2 font-orbitron";
           setCompleted(true);
           setTeam((prevTeam) => ({
             ...prevTeam,
@@ -162,16 +164,20 @@ export default function Home(props) {
           }));
         } else if (response.data.message === "Incorrect Flag") {
           message.innerHTML = "Incorrect flag, please try again.";
+          message.className = "text-red-500 mb-2 font-orbitron";
         } else if (response.data.message === "Incorrect challenge ID") {
           message.innerHTML = "Invalid challenge. Please try again.";
+          message.className = "text-red-500 mb-2 font-orbitron";
         }
       } catch (error) {
         console.error("Error submitting flag:", error);
         message.innerHTML =
           "There was an error submitting the flag. Please try again.";
+        message.className = "text-red-500 mb-2 font-orbitron";
       }
     } else {
       message.innerHTML = "The Flag should not be empty";
+      message.className = "text-red-500 mb-2 font-orbitron";
     }
   };
 
@@ -460,7 +466,7 @@ export default function Home(props) {
             )}
 
             <div className="mt-4">
-              <p id="message" className="text-red-500 mb-2 font-orbitron"></p>
+              <p id="message"></p>
               <input
                 id="flag_input"
                 type="text"
