@@ -66,7 +66,12 @@ router.post("/login", async (req, res) => {
 });
 
 router.get("/logout",(req,res)=>{
-  res.clearCookie(req.cookies.auth);
+  res.clearCookie('auth',{
+    path : '/',
+    httpOnly: false,  
+    sameSite: "None", 
+    secure: true
+  });
   return res.sendStatus(200)
 })
 
