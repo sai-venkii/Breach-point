@@ -247,7 +247,10 @@ export default function Home(props) {
           {/* Right section: Sign Out */}
           <motion.a
             onClick={() => {
-              Cookies.remove("auth"); // Remove the 'auth' cookie
+              Cookies.remove("auth",{
+                sameSite : "None",
+                secure: true
+              }); // Remove the 'auth' cookie
               localStorage.removeItem("auth");
               navigate("/login");
             }}
