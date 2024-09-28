@@ -66,7 +66,7 @@ router.post("/login", async (req, res) => {
 });
 
 router.get("/logout",(req,res)=>{
-  res.clearCookie('auth');
+  res.clearCookie(req.cookies.auth);
   return res.sendStatus(200)
 })
 
