@@ -16,13 +16,15 @@ export default function Home(props) {
   const [team, setTeam] = useState(null);
   const [currentHintId, setCurrentHintId] = useState(null);
   const [pointsReduce, setPointsReduce] = useState(0);
-  const [usedHints, setUsedHints] = useState(new Set());
+  const [usedHints, setUsedHints] = useState([{}]);
   const [isCompleted, setCompleted] = useState(false);
   const [selectedChallenge, setSelectedChallenge] = useState(null);
-  const [hints, setHints] = useState([]); // Change to an array
+  const [hints, setHints] = useState([{}]); // Change to an array
   const [showHintPrompt, setShowHintPrompt] = useState(false);
   const navigate = useNavigate();
-
+  useEffect(()=>{
+    console.log(hints)
+  },[hints])
   useEffect(() => {
     if (alertMessage.length != 0) {
       setShowAlert(true);
@@ -95,7 +97,7 @@ export default function Home(props) {
         `${API_BASE_URL}/api/challenges/${challengeId}/hint/${hintId}`,
         { withCredentials: true }
       );
-      return response.data.hint;
+      return {challengeId,hint:response.data.hint};
     } catch (error) {
       console.error("Error fetching hint:", error);
       return null;
@@ -123,18 +125,16 @@ export default function Home(props) {
       setShowHintPrompt(true);
 
       // Mark this hint as used
-      setUsedHints((prevUsedHints) => new Set(prevUsedHints).add(hintId));
+      // setUsedHints((prevUsedHints) => new Set(prevUsedHints).add(hintId));
+      setUsedHints((prevUsedHints) => [...prevUsedHints,{challengeId:selectedChallenge.id, hintId}]);
     }
   };
 
   const handleHintDecision = async (useHint, hintId) => {
     if (useHint) {
       const fetchedHint = await fetchHint(selectedChallenge.id, hintId);
-      setHints((prevHints) => {
-        const newHints = [...prevHints]; // Create a copy of the previous hints
-        newHints[hintId - 1] = fetchedHint; // Store the hint at the corresponding index
-        return newHints;
-      });
+      // selectedChallenge
+      setHints((prevHints) => [...prevHints,fetchedHint]);
     }
     setShowHintPrompt(false);
   };
@@ -320,7 +320,7 @@ export default function Home(props) {
                 .filter((item) => item.category === category)
                 .map((item) => (
                   <motion.div
-                    key={item.id}
+                    key={item}
                     className={`bg-gray-900 border-2 border-transparent p-6 rounded-lg text-center transition-all duration-300 ease-in-out transform hover:-translate-y-2 shadow-md hover:shadow-lg ${
                       item.points > 250
                         ? "hover:border-red-600"
@@ -401,12 +401,13 @@ export default function Home(props) {
               {/* Hints section */}
               <div className="mt-6">
                 <h3 className="text-xl font-bold text-white mb-3">
-                  Hints ({hints.length}/{selectedChallenge.hintCount} used)
+                  Hints ({hints.filter(elt=>elt.challengeId==selectedChallenge.id).length}/{selectedChallenge.hintCount} used)
                 </h3>
 
-                {hints.map((hint, index) => (
-                  <p key={index} className="hint-text font-orbitron text-orange-500 mb-2">
-                    Hint {index + 1}: {hint || "Hint not used yet."}
+                {hints.filter(elt=>elt.challengeId==selectedChallenge.id).map((hint, index) => (
+                  
+                   <p key={`hint-${hint}`}  className="hint-text font-orbitron text-orange-500 mb-2">
+                    Hint {index+1}: {hint.hint || "Hint not used yet."}
                   </p>
                 ))}
               </div>
@@ -487,16 +488,17 @@ export default function Home(props) {
               >
                 File
               </motion.a>
-              {!hints[selectedChallenge.id] &&
-                selectedChallenge.hintCount > 0 && (
+              {hints.filter(elt=>elt.challengeId==selectedChallenge.id).length<selectedChallenge.hintCount &&
+                 (
                   <div>
                     {[...Array(selectedChallenge.hintCount)].map((_, index) => {
-                      const hintId = index + 1;
+                      const hintId = index+1;
                       return (
-                        !usedHints.has(hintId) && ( // Only render if this hint hasn't been used
+                        !hints.find(elt=>elt.hintId==hintId) && ( // Only render if this hint hasn't been used
                           <motion.button
-                            key={index}
-                            onClick={() => promptForHint(hintId)}
+                            key={`hint-${hints[hintId-1]}`}
+                            
+                            onClick={() => {console.log(hintId);promptForHint(hintId);}}
                             className="bg-yellow-500 mt-3 mr-3 text-white px-4 py-2 rounded font-orbitron font-bold no-select"
                             whileHover={{ scale: 1.1 }}
                             transition={{ type: "spring", stiffness: 300 }}
