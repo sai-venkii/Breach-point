@@ -482,14 +482,14 @@ export default function Home(props) {
               >
                 Close
               </motion.button>
-              <motion.a
+              {selectedChallenge.files.length != 0 && <motion.a
                 href={selectedChallenge.files}
                 className="bg-blue-500 ml-3 text-white px-5 py-[10px] rounded font-orbitron font-bold no-select"
                 whileHover={{ scale: 1.1 }}
                 transition={{ type: "spring", stiffness: 300 }}
               >
                 File
-              </motion.a>
+              </motion.a>}
               {!hints[selectedChallenge.id] &&
                 selectedChallenge.hintCount > 0 && (
                   <div>
