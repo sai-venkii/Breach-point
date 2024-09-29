@@ -125,7 +125,7 @@ export default function Home(props) {
 
       // Mark this hint as used
       // setUsedHints((prevUsedHints) => new Set(prevUsedHints).add(hintId));
-      setUsedHints((prevUsedHints) => [...prevUsedHints,{challengeId:selectedChallenge.id, hintId}]);
+      // setUsedHints((prevUsedHints) => [...prevUsedHints,{challengeId:selectedChallenge.id, hintId}]);
     }
   };
 
@@ -134,6 +134,7 @@ export default function Home(props) {
       const fetchedHint = await fetchHint(selectedChallenge.id, hintId);
       // selectedChallenge
       setHints((prevHints) => [...prevHints,fetchedHint]);
+      setUsedHints((prevUsedHints) => [...prevUsedHints,{challengeId:selectedChallenge.id, hintId}]);
     }
     setShowHintPrompt(false);
   };
@@ -409,7 +410,8 @@ export default function Home(props) {
             </p>
 
               {/* Hints section */}
-              <div className="mt-6">
+              {selectedChallenge.hintCount > 0 &&
+                <div className="mt-6">
                 <h3 className="text-xl font-bold text-white mb-3">
                   Hints ({hints.filter(elt=>elt.challengeId==selectedChallenge.id).length}/{selectedChallenge.hintCount} used)
                 </h3>
@@ -421,6 +423,7 @@ export default function Home(props) {
                   </p>
                 ))}
               </div>
+              }
 
             {showHintPrompt && (
               <motion.div
@@ -505,11 +508,10 @@ export default function Home(props) {
                     {[...Array(selectedChallenge.hintCount)].map((_, index) => {
                       const hintId = index+1;
                       return (
-                        !hints.find(elt=>elt.hintId==hintId) && ( // Only render if this hint hasn't been used
+                        !usedHints.find(elt => elt.hintId === hintId && elt.challengeId === selectedChallenge.id) && ( // Only render if this hint hasn't been used
                           <motion.button
-                            key={`hint-${hints[hintId-1]}`}
-                            
-                            onClick={() => {console.log(hintId);promptForHint(hintId);}}
+                            key={`hint-${hintId}-${selectedChallenge.id}`} 
+                            onClick={() => {promptForHint(hintId);}}
                             className="bg-yellow-500 mt-3 mr-3 text-white px-4 py-2 rounded font-orbitron font-bold no-select"
                             whileHover={{ scale: 1.1 }}
                             transition={{ type: "spring", stiffness: 300 }}
