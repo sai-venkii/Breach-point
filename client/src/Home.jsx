@@ -292,6 +292,7 @@ export default function Home(props) {
               try{
                 const logout = await axios.get(`${API_BASE_URL}/auth/logout`);
                 if(logout.status == 200){
+                  localStorage.clear()
                   navigate('/login')
                 }
               }catch(err){
