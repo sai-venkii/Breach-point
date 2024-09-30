@@ -15,12 +15,26 @@ export default function Home(props) {
   const [team, setTeam] = useState(null);
   const [currentHintId, setCurrentHintId] = useState(null);
   const [pointsReduce, setPointsReduce] = useState(0);
-  const [usedHints, setUsedHints] = useState([{}]);
+  const [usedHints, setUsedHints] = useState(() => {
+    const storedHints = localStorage.getItem('usedHints');
+    return storedHints ? JSON.parse(storedHints) : [];
+  });
   const [isCompleted, setCompleted] = useState(false);
   const [selectedChallenge, setSelectedChallenge] = useState(null);
-  const [hints, setHints] = useState([{}]); // Change to an array
+  const [hints, setHints] = useState(() => {
+    const storedHints = localStorage.getItem('hints');
+    return storedHints ? JSON.parse(storedHints) : []; // Make sure this returns an array
+  });
   const [showHintPrompt, setShowHintPrompt] = useState(false);
   const navigate = useNavigate();
+  useEffect(() => {
+    localStorage.setItem('usedHints', JSON.stringify(usedHints));
+    console.log("Local Item Updated")
+  }, [usedHints]); 
+  useEffect(() => {
+    localStorage.setItem('hints', JSON.stringify(hints));
+    console.log("hints Updated");
+  }, [hints]);   
   useEffect(() => {
     const handleEsc = (event) => {
       if (event.key === 'Escape') {
