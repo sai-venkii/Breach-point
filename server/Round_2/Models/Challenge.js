@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const conn = require("../../connection_round_2");
+const AutoIncrement = require('mongoose-sequence')(mongoose);
 
 const challengeSchema = new mongoose.Schema({
     machine_name: {
@@ -25,7 +26,9 @@ const challengeSchema = new mongoose.Schema({
         default:0
     }
 });
-
+challengeSchema.plugin(AutoIncrement, {
+    inc_field: "challenge_id",
+  });
 challengeSchema.statics.getChallenge = async function(machine_assigned,flag){
     return await this.findOne({machine_name:machine_assigned,flag:flag},'-_id -__v');
 }

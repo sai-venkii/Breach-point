@@ -15,7 +15,7 @@ const teamSchema = new mongoose.Schema({
         type: Number,
         default: 0,
     },
-    solved_type: {
+    solved_challenges: {
         type: [String],
         default: []
     },

@@ -18,19 +18,19 @@ router.post("/submit", authMiddleware, async (req, res) => {
     if(!challenge){
       return res.status(202).json({ message: "Incorrect Flag" });
     }
-    category=challenge.category;
-    const {solved_type} = await Teams.getTeam(team);
-    console.log(solved_type);
-    if(solved_type.includes(category)){
+    const challengeID=challenge.challenge_id;
+    const {solved_challenges} = await Teams.getTeam(team);
+    // console.log(solved_type);
+    if(solved_challenges.includes(challengeID)){
       res.status(203).json({
-        message:"Similar Type of challenge has been solved already."
+        message:"Challenge has been solved already."
       })
     }else{
       const challenge_machine = challenge.machine_name;
       //Increment points
       const updateTeamScore = await Teams.findOneAndUpdate({name:team},{
         $inc: { points: challenge.points },            
-        $addToSet: { solved_type: category },
+        $addToSet: { solved_challenges: challengeID },
         $set:{
           score_update_time:Date.now()
         } 
@@ -45,7 +45,7 @@ router.post("/submit", authMiddleware, async (req, res) => {
         score:updateTeamScore.points
       })
     }
-    console.log(category);
+    // console.log(category);
 
   } catch (err) {
     console.log(err);
@@ -54,13 +54,19 @@ router.post("/submit", authMiddleware, async (req, res) => {
     });
   }
 });
+
 router.get("/score",authMiddleware,async(req,res)=>{
   try{
     const {team} = req.user;
-    const db_team=await Teams.findOne({name:team},"-_id -__v");
+    const db_team=await Teams.findOne({name:team},"-_id -__v -password -score_update_time");
+    // console.log(db_team);
     if(db_team){
       return res.status(200).json({
-        score:db_team.points
+        name:db_team.name,
+        points:db_team.points,
+        solved:db_team.solved_challenges.length,
+        score:db_team.points,
+        machine_assigned:db_team.machine_assigned
       })
     }
     res.status(201).json({
@@ -141,7 +147,8 @@ router.post("/auth/login", async (req, res) => {
         expiresIn: "5hr",
       });
       res
-        .cookie("auth", token, { maxAge: 2 * 60 * 60 * 1000, httpOnly: true })
+        .cookie("auth", token, { maxAge: 3 * 60 * 60 * 1000, httpOnly: false,  sameSite: "None", 
+          secure: true })
         .send("Success");
     } else {
       res.status(401).json({ message: "Invalid credentials" });

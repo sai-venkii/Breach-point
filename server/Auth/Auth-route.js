@@ -51,7 +51,7 @@ router.post("/login", async (req, res) => {
         expiresIn: "5hr",
       });
       res
-        .cookie("auth", token, { maxAge: 5 * 60 * 60 * 1000, httpOnly: false,  sameSite: "None", 
+        .cookie("auth", token, { maxAge: 3 * 60 * 60 * 1000, httpOnly: false,  sameSite: "None", 
           secure: true })
         .send("Success");
     } else {
