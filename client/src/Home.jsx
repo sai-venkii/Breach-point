@@ -24,6 +24,9 @@ export default function Home(props) {
   useEffect(()=>{
     console.log(hints)
   },[hints])
+  useEffect(()=>{
+    console.log(selectedChallenge)
+  },[selectedChallenge])
   useEffect(() => {
     if (alertMessage.length != 0) {
       setShowAlert(true);
@@ -70,6 +73,7 @@ export default function Home(props) {
         }
       );
       const fullChallenge = response.data;
+      console.log(fullChallenge)
       setSelectedChallenge({
         id: fullChallenge.id,
         name: fullChallenge.name,
@@ -78,7 +82,10 @@ export default function Home(props) {
         description: fullChallenge.description,
         hintCount: fullChallenge.hintCount,
         files: fullChallenge.files,
+        pointsReduce : fullChallenge['points reduction'],
+        solves : fullChallenge.solves
       });
+      console.log(selectedChallenge)
     } catch (error) {
       console.error("Error fetching challenge details:", error);
     }
@@ -117,10 +124,10 @@ export default function Home(props) {
   };
 
   const promptForHint = async (hintId) => {
-    const hintData = await fetchPoint(selectedChallenge.id, hintId);
-    if (hintData) {
+    // const hintData = await fetchPoint(selectedChallenge.id, hintId);
+    if (hintId) {
       setCurrentHintId(hintId);
-      setPointsReduce(hintData);
+      // setPointsReduce(hintData);
       setShowHintPrompt(true);
 
       // Mark this hint as used
@@ -402,7 +409,7 @@ export default function Home(props) {
             <h2 className="text-2xl font-bold mb-4 text-hacker-green font-orbitron no-select">
               {selectedChallenge.name}
             </h2>
-            <p className="mb-4 font-orbitron text-hacker-green no-select">
+            <p className="mb-4 font-orbitron break-words text-hacker-green no-select">
               {selectedChallenge.description}
             </p>
             <p className="mb-4 font-orbitron text-hacker-green no-select">
@@ -446,10 +453,11 @@ export default function Home(props) {
                   animate={{ scale: 1, opacity: 1 }}
                   exit={{ scale: 0.8, opacity: 0 }}
                 >
-                  <p className="mb-4 text-yellow-500 font-orbitron">
-                    Are you sure you want to use a hint? {pointsReduce} points
+                <p className="mb-4 text-yellow-500 font-orbitron">
+                    Are you sure you want to use a hint? {selectedChallenge.pointsReduce[currentHintId-1]
+                    } points
                     will be reduced.
-                  </p>
+                </p>
                   <div className="flex justify-between">
                     <button
                       onClick={() => handleHintDecision(true, currentHintId)} // Pass the current hint ID
@@ -494,10 +502,12 @@ export default function Home(props) {
                 Close
               </motion.button>
               {selectedChallenge.files.length != 0 && <motion.a
-                href={selectedChallenge.files}
                 className="bg-blue-500 ml-3 text-white px-5 py-[10px] rounded font-orbitron font-bold no-select"
                 whileHover={{ scale: 1.1 }}
                 transition={{ type: "spring", stiffness: 300 }}
+                onClick={(e)=>{
+                  window.open(selectedChallenge.files,'_blank','noopener,noreferrer')
+                }}
               >
                 File
               </motion.a>
