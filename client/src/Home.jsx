@@ -29,11 +29,9 @@ export default function Home(props) {
   const navigate = useNavigate();
   useEffect(() => {
     localStorage.setItem('usedHints', JSON.stringify(usedHints));
-    console.log("Local Item Updated")
   }, [usedHints]); 
   useEffect(() => {
     localStorage.setItem('hints', JSON.stringify(hints));
-    console.log("hints Updated");
   }, [hints]);   
   useEffect(() => {
     const handleEsc = (event) => {
@@ -50,12 +48,6 @@ export default function Home(props) {
       window.removeEventListener('keydown', handleEsc);
     };
   }, [setSelectedChallenge]);
-  useEffect(()=>{
-    console.log(hints)
-  },[hints])
-  useEffect(()=>{
-    console.log(selectedChallenge)
-  },[selectedChallenge])
   useEffect(() => {
     if (alertMessage.length != 0) {
       setShowAlert(true);
@@ -102,7 +94,6 @@ export default function Home(props) {
         }
       );
       const fullChallenge = response.data;
-      console.log(fullChallenge)
       setSelectedChallenge({
         id: fullChallenge.id,
         name: fullChallenge.name,
@@ -114,7 +105,6 @@ export default function Home(props) {
         pointsReduce : fullChallenge['points reduction'],
         solves : fullChallenge.solves
       });
-      console.log(selectedChallenge)
     } catch (error) {
       console.error("Error fetching challenge details:", error);
     }
@@ -539,7 +529,7 @@ export default function Home(props) {
                   window.open(selectedChallenge.files,'_blank','noopener,noreferrer')
                 }}
               >
-                File
+                {selectedChallenge.category == "Web Exploitation" ? "Link" : "File"}
               </motion.a>
               }
               {hints.filter(elt=>elt.challengeId==selectedChallenge.id).length<selectedChallenge.hintCount &&
