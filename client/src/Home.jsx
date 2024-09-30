@@ -21,6 +21,21 @@ export default function Home(props) {
   const [hints, setHints] = useState([{}]); // Change to an array
   const [showHintPrompt, setShowHintPrompt] = useState(false);
   const navigate = useNavigate();
+  useEffect(() => {
+    const handleEsc = (event) => {
+      if (event.key === 'Escape') {
+        setSelectedChallenge(null); // Close the modal
+      }
+    };
+
+    // Add event listener
+    window.addEventListener('keydown', handleEsc);
+
+    // Clean up the event listener when the component unmounts
+    return () => {
+      window.removeEventListener('keydown', handleEsc);
+    };
+  }, [setSelectedChallenge]);
   useEffect(()=>{
     console.log(hints)
   },[hints])
