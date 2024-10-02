@@ -22,7 +22,6 @@ const teamSchema = new mongoose.Schema({
     machine_assigned: {
         type: String,
         required: true,
-        unique:true
     },
     score_update_time: {
         type: Date,
