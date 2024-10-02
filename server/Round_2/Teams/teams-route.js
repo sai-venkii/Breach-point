@@ -93,8 +93,6 @@ router.post("/addteam", async (req, res) => {
     const machine = await Teams.findOne({ machine_assigned: machine_name });
     if (user) {
       res.status(202).json({ message: "Team already exists" });
-    } else if (machine) {
-      res.status(202).json({ message: "Machine Already assigned" });
     } else {
       const newTeam = new Teams({
         name: name,
