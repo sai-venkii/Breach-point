@@ -65,7 +65,7 @@ router.get("/score",authMiddleware,async(req,res)=>{
     // console.log(db_team);
     if(db_team){
       const box=await Challenges.find({machine_name:db_team.machine_assigned});
-      console.log(box.length);
+      // console.log(box.length);
       return res.status(200).json({
         name:db_team.name,
         points:db_team.points,
