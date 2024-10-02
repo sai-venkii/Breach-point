@@ -29,6 +29,7 @@ const teamSchema = new mongoose.Schema({
         default: Date.now()
     }
 });
+
 teamSchema.pre('save',async function(next){
     try{
         // console.log(this);
@@ -46,8 +47,9 @@ teamSchema.pre('save',async function(next){
 });
 
 teamSchema.statics.getTeam = async function(team_name){
-    return await this.findOne({name:team_name},'-password -_id -__v');
+    return await this.findOne({name:team_name},'-password -_id ');
 }
+
 const Teams = conn.model("Teams", teamSchema);
 
 module.exports = Teams;

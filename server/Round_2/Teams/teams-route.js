@@ -10,23 +10,30 @@ router.post("/submit", authMiddleware, async (req, res) => {
   try {
     const { team } = req.user;
     const user_flag = req.body.flag;
-    const result = await isSameMachineFlag(team, user_flag);
-    if (result) {
-      return res.status(201).json({ message: "Flag from Same Machine" });
+    const db_team = await Teams.getTeam(team);
+    if(!db_team){
+      throw Error("Team not found",err)
     }
+    // console.log(machine_assigned);
     let challenge = await Challenges.findOne({flag:user_flag},'-_id');
     if(!challenge){
       return res.status(202).json({ message: "Incorrect Flag" });
     }
+    const machine_assigned=db_team.machine_assigned;
+    if (challenge.machine_name !== machine_assigned){
+      return res.status(201).json({
+        message:"Wrong Flag"
+      })
+    }
     const challengeID=challenge.challenge_id;
-    const {solved_challenges} = await Teams.getTeam(team);
+    // console.log(typeof(challengeID));
+    const {solved_challenges} = db_team;
     // console.log(solved_type);
     if(solved_challenges.includes(challengeID)){
       res.status(203).json({
         message:"Challenge has been solved already."
       })
     }else{
-      const challenge_machine = challenge.machine_name;
       //Increment points
       const updateTeamScore = await Teams.findOneAndUpdate({name:team},{
         $inc: { points: challenge.points },            
@@ -35,15 +42,11 @@ router.post("/submit", authMiddleware, async (req, res) => {
           score_update_time:Date.now()
         } 
       },{new:true});
-      const deductTeamScore = await Teams.findOneAndUpdate({machine_assigned:challenge_machine},{
-        $inc:{
-          points:-1*challenge.points_deduct
-        }
-      },{new:true});
       res.status(200).json({
         message:"Solved",
         score:updateTeamScore.points
       })
+      console.log(`${updateTeamScore.name} has solved challenge ${challengeID}`);
     }
     // console.log(category);
 
@@ -108,26 +111,26 @@ router.post("/addteam", async (req, res) => {
   }
 });
 
-const isSameMachineFlag = async (team, flag) => {
-  try {
-    const {machine_assigned} = await Teams.getTeam(team);
-    if(!machine_assigned){
-      throw Error("Team not found",err)
-    }
-    // console.log(machine_assigned);
-    const ownChallenge = await Challenges.getChallenge(
-      machine_assigned,flag
-    );
-    if(ownChallenge){
-      return true;
-    }else{
-      return false;
-    }
-  } catch (err) {
-    console.log(err);
-    throw Error("Error in checking same Machine Flag", err);
-  }
-};
+// const isSameMachineFlag = async (team, flag) => {
+//   try {
+//     const {machine_assigned} = await Teams.getTeam(team);
+//     if(!machine_assigned){
+//       throw Error("Team not found",err)
+//     }
+//     // console.log(machine_assigned);
+//     const ownChallenge = await Challenges.getChallenge(
+//       machine_assigned,flag
+//     );
+//     if(ownChallenge){
+//       return true;
+//     }else{
+//       return false;
+//     }
+//   } catch (err) {
+//     console.log(err);
+//     throw Error("Error in checking same Machine Flag", err);
+//   }
+// };
 
 router.post("/auth/login", async (req, res) => {
   const { teamName, password } = req.body;

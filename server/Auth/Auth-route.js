@@ -72,7 +72,9 @@ router.get("/logout",(req,res)=>{
     sameSite: "None", 
     secure: true
   });
+
   return res.sendStatus(200)
+  
 })
 
 module.exports = router;

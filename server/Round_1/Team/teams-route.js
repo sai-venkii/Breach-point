@@ -67,14 +67,14 @@ router.post("/submit/:id", authMiddleware, async (req, res) => {
         }
         // console.log(points);
         const updated_team = await Teams.updateScore(team, points);
-        res.status(200).json({
-          status: "Solved",
-          score: updated_team.score,
-        });
         await Challenges.updateSolves(id);
         // console.log(updated_team);
         await Teams.addCompletedChallenge(team, id);
         await solvedChallenges.markSolved(team, id);
+        res.status(200).json({
+          status: "Solved",
+          score: updated_team.score,
+        });
       } else {
         res.status(202).json({ message: "Incorrect Flag" });
       }
