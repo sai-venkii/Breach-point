@@ -62,8 +62,12 @@ router.post("/submit", authMiddleware, async (req, res) => {
 router.get("/cred",authMiddleware,async(req,res)=>{
   try{
     const cred = await Cred.find({},"user -_id");
+    let cred_arry=[];
+    for(let i=0;i<cred.length;i++){
+      cred_arry.push(cred[i].user)
+    }
     res.status(200).json({
-      cred:cred
+      cred:cred_arry
     })
   }catch(err){
     console.log(err);
