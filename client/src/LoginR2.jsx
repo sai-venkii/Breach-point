@@ -44,7 +44,7 @@ const LoginR2 = () => {
       if (response.status === 200) {
         setAlertType("success");
         setAlertMessage("Login successful! Redirecting to home...");
-        setTimeout(() => navigate('/round2'), 2000);
+        setTimeout(() => navigate('/'), 2000);
       }
     } catch (error) {
       console.error('Error:', error);
