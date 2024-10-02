@@ -14,7 +14,7 @@ function Round2() {
   const [showAlert, setShowAlert] = useState(false);
   const [inputFlag, setInputFlag] = useState("");
   const [correctFlags, setCorrectFlags] = useState([]);
-  const [totalFlags] = useState(20);
+  const [totalFlags,setTotalFlags] = useState(20);
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [teamName, setTeamName] = useState("Your Team Name");
@@ -31,6 +31,7 @@ function Round2() {
           setTeamScore(response.data.points);
           setSolvedChallenges(response.data.solved);
           setMachineAssigned(response.data.machine_assigned);
+          setTotalFlags(response.data.total_flags)
         }
       } catch (err) {
         if (err.response && err.response.status === 403) {
