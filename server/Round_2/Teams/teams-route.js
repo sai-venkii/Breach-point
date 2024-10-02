@@ -59,6 +59,20 @@ router.post("/submit", authMiddleware, async (req, res) => {
   }
 });
 
+router.get("/cred",authMiddleware,async(req,res)=>{
+  try{
+    const cred = await Cred.find({},"user -_id");
+    res.status(200).json({
+      cred:cred
+    })
+  }catch(err){
+    console.log(err);
+    res.status(500).json({
+      message:"Error cred"
+    });
+  }
+})
+
 router.post("/cred",authMiddleware,async(req,res)=>{
   try{
     const {team}=req.user;
