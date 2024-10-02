@@ -16,19 +16,36 @@ function Round2() {
   const [correctFlags, setCorrectFlags] = useState([]);
   const [totalFlags, setTotalFlags] = useState(20);
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
+  const [isUserButtonDisabled,setIsUserButtonDisabled] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isUserSubmitting,setIsUserSubmitting] = useState(false);
   const [teamName, setTeamName] = useState("Your Team Name");
-  const [teamScore, setTeamScore] = useState(0);
+  // const [teamScore, setTeamScore] = useState(0);
   const [solvedChallenges, setSolvedChallenges] = useState(0);
   const [machineAssigned, setMachineAssigned] = useState("");
+  const [machinePassword,setMachinePassword] = useState("")
+  const [machineUsername,setMachineUsername] = useState("")
+  const [showUsers,setShowUsers] = useState([])
 
+  useEffect(()=>{
+    const fetchUsers = async() =>{
+      try{
+        const response = await axios.get(`${API_BASE_URL}/api/round_2/cred`);
+        setShowUsers(response.data.cred)
+        console.log(setShowUsers)
+        console.log(response.data.cred)
+      }catch(err){
+        console.log(err)
+      }
+    };
+    fetchUsers();
+  },[])
   useEffect(() => {
     const fetchTeamInfo = async () => {
       try {
         const response = await axios.get(`${API_BASE_URL}/api/round_2/score`);
         if (response.status === 200) {
           setTeamName(response.data.name);
-          setTeamScore(response.data.points);
           setSolvedChallenges(response.data.solved);
           setMachineAssigned(response.data.machine_assigned);
           setTotalFlags(response.data.total_flags);
@@ -56,6 +73,42 @@ function Round2() {
     }
   }, [alertMessage]);
 
+  const handleUserSubmit = async (e) =>{
+    e.preventDefault();
+    if(machineUsername.length === 0 || machinePassword.length === 0){
+      setAlertMessage("Please enter all the details");
+      setAlertType("error");
+    }else{
+      try {
+        setIsUserSubmitting(true);
+        setIsUserButtonDisabled(true);
+        const response = await axios.post(
+          `${API_BASE_URL}/api/round_2/cred`,
+          {
+            user :  machineUsername,
+            password : machinePassword
+          }
+        );
+        if (response.status === 200 && response.data.correct) {
+          setAlertMessage(response.data.message);
+          setAlertType("success");
+
+          // Update team score and correct flags
+          setCorrectFlags([...correctFlags, inputFlag]);
+          setSolvedChallenges(response.data.solved);
+        } else {
+          setAlertMessage(response.data.message);
+          setAlertType("error");
+        }
+      } catch (err) {
+        setAlertMessage("Error submitting flag");
+        setAlertType("error");
+      } finally {
+        setIsUserSubmitting(false);
+        setTimeout(() => setIsUserButtonDisabled(false), 1500);
+      }
+    }
+  }
   const handleFlagSubmit = async (e) => {
     e.preventDefault();
     if (inputFlag.length === 0) {
@@ -78,7 +131,7 @@ function Round2() {
           setAlertType("success");
 
           // Update team score and correct flags
-          setTeamScore(response.data.newTeamScore);
+          // setTeamScore(response.data.newTeamScore);
           setCorrectFlags([...correctFlags, inputFlag]);
           setSolvedChallenges(response.data.solved);
         } else {
@@ -163,15 +216,15 @@ function Round2() {
             Team: {teamName}
           </motion.h2>
 
-          <motion.h3
+          {/* <motion.h3
             className="text-xl text-hacker-green font-bold mb-2 no-select"
-            variants={spanVariants}
+            variants={spanVariants} 
             initial="hidden"
             animate="visible"
             exit="exit"
           >
             Score: {teamScore}
-          </motion.h3>
+          </motion.h3> */}
 
           {/* Display the machine assigned to the team */}
           <motion.h3
@@ -183,6 +236,16 @@ function Round2() {
           >
             Machine Assigned: {machineAssigned}
           </motion.h3>
+          <motion.h3
+            className="text-xl text-hacker-green font-bold mb-2 no-select"
+            variants={spanVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+          >
+            Users: {showUsers.join(", ")}
+          </motion.h3>
+          
 
           <motion.p
             className="text-xl text-hacker-green font-orbitron no-select"
@@ -236,7 +299,7 @@ function Round2() {
               </button>
             </motion.div>
           </form>
-          <form onSubmit={handleFlagSubmit} className="p-3">
+          <form onSubmit={handleUserSubmit} className="p-3">
             <motion.div
               className="flex "
               variants={spanVariants}
@@ -248,15 +311,15 @@ function Round2() {
                 type="text"
                 className="p-2 text-black border-none focus:ring-hacker-green mb-4"
                 placeholder="Enter Username"
-                value={inputFlag}
-                onChange={(e) => setInputFlag(e.target.value)}
+                value={machineUsername}
+                onChange={(e) => setMachineUsername(e.target.value)}
               />
               <input
                 type="text"
                 className="p-2 ml-2 text-black border-none focus:ring-hacker-green mb-4"
                 placeholder="Enter Password"
-                value={inputFlag}
-                onChange={(e) => setInputFlag(e.target.value)}
+                value={machinePassword}
+                onChange={(e) => setMachinePassword(e.target.value)}
               />
             </motion.div>
             <motion.div
@@ -268,14 +331,14 @@ function Round2() {
             >
               <button
                 type="submit"
-                disabled={isButtonDisabled || isSubmitting}
+                disabled={isUserButtonDisabled || isUserSubmitting}
                 className={`ml-2 p-2 h-10 bg-hacker-green text-black font-bold ${
-                  isSubmitting || isButtonDisabled
+                  isUserSubmitting || isUserButtonDisabled
                     ? "opacity-50 cursor-not-allowed"
                     : ""
                 }`}
               >
-                {isSubmitting ? "Please wait..." : "Submit"}
+                {isUserSubmitting ? "Please wait..." : "Submit"}
               </button>
             </motion.div>
           </form>

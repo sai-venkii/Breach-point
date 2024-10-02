@@ -90,7 +90,7 @@ router.post("/cred",authMiddleware,async(req,res)=>{
     const corr_password=cred.password;
     if(corr_password === password){
       if(cred.teamsSolved.includes(team)){
-        return res.status()
+        return res.status(200).json({message : "Already Submitted"})
       }
       cred.teamsSolved.push(team);
       await cred.save();
