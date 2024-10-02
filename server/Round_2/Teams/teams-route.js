@@ -64,12 +64,15 @@ router.get("/score",authMiddleware,async(req,res)=>{
     const db_team=await Teams.findOne({name:team},"-_id -__v -password -score_update_time");
     // console.log(db_team);
     if(db_team){
+      const box=await Challenges.find({machine_name:db_team.machine_assigned});
+      console.log(box.length);
       return res.status(200).json({
         name:db_team.name,
         points:db_team.points,
         solved:db_team.solved_challenges.length,
         score:db_team.points,
-        machine_assigned:db_team.machine_assigned
+        machine_assigned:db_team.machine_assigned,
+        total_flags:box.length
       })
     }
     res.status(201).json({
