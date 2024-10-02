@@ -4,7 +4,7 @@ import "./Home.css";
 import logo from "./assets/breachpoint.png";
 import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
-import API_BASE_URL from './config';
+import API_BASE_URL from "./config";
 
 function Round2() {
   axios.defaults.withCredentials = true;
@@ -14,7 +14,7 @@ function Round2() {
   const [showAlert, setShowAlert] = useState(false);
   const [inputFlag, setInputFlag] = useState("");
   const [correctFlags, setCorrectFlags] = useState([]);
-  const [totalFlags,setTotalFlags] = useState(20);
+  const [totalFlags, setTotalFlags] = useState(20);
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [teamName, setTeamName] = useState("Your Team Name");
@@ -31,7 +31,7 @@ function Round2() {
           setTeamScore(response.data.points);
           setSolvedChallenges(response.data.solved);
           setMachineAssigned(response.data.machine_assigned);
-          setTotalFlags(response.data.total_flags)
+          setTotalFlags(response.data.total_flags);
         }
       } catch (err) {
         if (err.response && err.response.status === 403) {
@@ -66,9 +66,12 @@ function Round2() {
         setIsSubmitting(true);
         setIsButtonDisabled(true);
 
-        const response = await axios.post(`${API_BASE_URL}/api/round_2/submit`, {
-          flag: inputFlag,
-        });
+        const response = await axios.post(
+          `${API_BASE_URL}/api/round_2/submit`,
+          {
+            flag: inputFlag,
+          }
+        );
 
         if (response.status === 200 && response.data.correct) {
           setAlertMessage(response.data.message);
@@ -94,13 +97,21 @@ function Round2() {
 
   const navVariants = {
     hidden: { opacity: 0, y: -20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: "easeInOut" } },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.7, ease: "easeInOut" },
+    },
     exit: { opacity: 0, y: 20 },
   };
 
   const spanVariants = {
     hidden: { opacity: 0, y: -20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: "easeInOut" } },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.7, ease: "easeInOut" },
+    },
     exit: { opacity: 0, y: 20 },
   };
 
@@ -185,54 +196,101 @@ function Round2() {
         </div>
 
         {/* Flag Submission Section */}
-          <div className="text-center">
-            <motion.h2
-              className="text-2xl text-hacker-green font-bold p-3 no-select"
+        <div className="text-center">
+          <motion.h2
+            className="text-2xl text-hacker-green font-bold p-3 no-select"
+            variants={spanVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+          >
+            Submit your flags
+          </motion.h2>
+
+          {/* Move the flag submission form here */}
+          <form onSubmit={handleFlagSubmit} className="p-3">
+            <motion.div
+              className="flex flex-col justify-center items-center"
               variants={spanVariants}
               initial="hidden"
               animate="visible"
               exit="exit"
             >
-              Submit your flags
-            </motion.h2>
-
-            {/* Move the flag submission form here */}
-            <form onSubmit={handleFlagSubmit} className="p-3">
-              <motion.div
-                className="flex flex-col justify-center items-center"
-                variants={spanVariants}
-                initial="hidden"
-                animate="visible"
-                exit="exit"
+              <input
+                type="text"
+                className="p-2 text-black border-none focus:ring-hacker-green mb-4"
+                placeholder="Enter flag"
+                value={inputFlag}
+                onChange={(e) => setInputFlag(e.target.value)}
+              />
+              <button
+                type="submit"
+                disabled={isButtonDisabled || isSubmitting}
+                className={`ml-2 p-2 bg-hacker-green text-black font-bold ${
+                  isSubmitting || isButtonDisabled
+                    ? "opacity-50 cursor-not-allowed"
+                    : ""
+                }`}
               >
-                <input
-                  type="text"
-                  className="p-2 text-black border-none focus:ring-hacker-green mb-4"
-                  placeholder="Enter flag"
-                  value={inputFlag}
-                  onChange={(e) => setInputFlag(e.target.value)}
-                />
-                <button
-                  type="submit"
-                  disabled={isButtonDisabled || isSubmitting}
-                  className={`ml-2 p-2 bg-hacker-green text-black font-bold ${isSubmitting || isButtonDisabled ? "opacity-50 cursor-not-allowed" : ""
-                    }`}
-                >
-                  {isSubmitting ? "Please wait..." : "Submit Flag"}
-                </button>
-              </motion.div>
-            </form>
-          </div>
+                {isSubmitting ? "Please wait..." : "Submit Flag"}
+              </button>
+            </motion.div>
+          </form>
+          <form onSubmit={handleFlagSubmit} className="p-3">
+            <motion.div
+              className="flex "
+              variants={spanVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+            >
+              <input
+                type="text"
+                className="p-2 text-black border-none focus:ring-hacker-green mb-4"
+                placeholder="Enter Username"
+                value={inputFlag}
+                onChange={(e) => setInputFlag(e.target.value)}
+              />
+              <input
+                type="text"
+                className="p-2 ml-2 text-black border-none focus:ring-hacker-green mb-4"
+                placeholder="Enter Password"
+                value={inputFlag}
+                onChange={(e) => setInputFlag(e.target.value)}
+              />
+            </motion.div>
+            <motion.div
+              className="flex justify-center items-center"
+              variants={spanVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+            >
+              <button
+                type="submit"
+                disabled={isButtonDisabled || isSubmitting}
+                className={`ml-2 p-2 h-10 bg-hacker-green text-black font-bold ${
+                  isSubmitting || isButtonDisabled
+                    ? "opacity-50 cursor-not-allowed"
+                    : ""
+                }`}
+              >
+                {isSubmitting ? "Please wait..." : "Submit"}
+              </button>
+            </motion.div>
+          </form>
         </div>
+      </div>
 
       {showAlert && (
         <AnimatePresence>
           <div className="fixed top-0 left-0 right-0 flex justify-center z-50">
             <motion.div
-              className={`flex items-center p-4 text-sm border rounded-lg mt-4 ${alertType === "success"
-                ? "text-green-800 border-green-300 bg-green-50"
-                : "text-red-800 border-red-300 bg-red-50"
-                }`}
+              className={`flex items-center p-4 text-sm border rounded-lg mt-4 ${
+                alertType === "success"
+                  ? "text-green-800 border-green-300 bg-green-50"
+                  : "text-red-800 border-red-300 bg-red-50"
+              }`}
               role="alert"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -247,7 +305,9 @@ function Round2() {
               >
                 <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
               </svg>
-              <span className="sr-only">{alertType === "success" ? "Success" : "Error"}</span>
+              <span className="sr-only">
+                {alertType === "success" ? "Success" : "Error"}
+              </span>
               <div>
                 <span className="font-medium"></span> {alertMessage}
               </div>
