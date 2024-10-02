@@ -89,13 +89,12 @@ function Round2() {
             password : machinePassword
           }
         );
-        if (response.status === 200 && response.data.correct) {
+        if (response.status === 200) {
           setAlertMessage(response.data.message);
           setAlertType("success");
-
           // Update team score and correct flags
-          setCorrectFlags([...correctFlags, inputFlag]);
-          setSolvedChallenges(response.data.solved);
+          // setCorrectFlags([...correctFlags, inputFlag]);
+          // setSolvedChallenges(response.data.solved);
         } else {
           setAlertMessage(response.data.message);
           setAlertType("error");
