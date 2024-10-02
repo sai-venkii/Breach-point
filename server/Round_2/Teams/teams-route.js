@@ -3,6 +3,7 @@ const router = express.Router();
 const Teams = require("../Models/Teams");
 const Challenges = require("../Models/Challenge");
 const authMiddleware = require("../../Auth/Auth-middleware");
+const Cred=require("../Models/UserCred");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
@@ -58,6 +59,64 @@ router.post("/submit", authMiddleware, async (req, res) => {
   }
 });
 
+router.post("/cred",authMiddleware,async(req,res)=>{
+  try{
+    const {team}=req.user;
+    const {user,password}=req.body;
+    const cred= await Cred.findOne({user:user});
+    if(!cred){
+      return res.status(201).json({
+        message:"Wrong user"
+      })
+    }
+    const corr_password=cred.password;
+    if(corr_password === password){
+      if(cred.teamsSolved.includes(team)){
+        return res.status()
+      }
+      cred.teamsSolved.push(team);
+      await cred.save();
+      res.status(200).json({
+        message:"Correct"
+      })
+    }else{
+      res.status(201).json({
+        message:"Incorrect password"
+      });
+    }
+  }catch(err){
+    console.error(err);
+    res.status(500).json({
+      message:"Failed evaluating credentials"
+    })
+  }
+})
+
+router.post("/addCred",async(req,res)=>{
+  try{ 
+    const {user,password}=req.body;
+    const existing_cred= await Cred.findOne({user:user,password:password});
+    if(existing_cred){
+      return res.status(201).json({
+        message:"Credentials already exist"
+      })
+    }
+    const cred=new Cred({
+      user:user,
+      password:password
+    })
+    await cred.save()
+    res.status(200).json({
+      message:"Added"
+    })
+  }catch(err){
+    console.log(err);
+    res.status(500).status({
+      message:"Could not add cred"
+    })
+  }
+})
+
 router.get("/score",authMiddleware,async(req,res)=>{
   try{
     const {team} = req.user;
@@ -105,10 +164,11 @@ router.post("/addteam", async (req, res) => {
       });
     }
   } catch (err) {
-    console.log(err);
     res.status(500).json({
       message: "Error Adding Team",
     });
+    console.log(err);
+    
   }
 });
 
