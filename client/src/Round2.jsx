@@ -94,8 +94,8 @@ function Round2() {
           setAlertType("success");
 
           // Update team score and correct flags
-          setCorrectFlags([...correctFlags, inputFlag]);
-          setSolvedChallenges(response.data.solved);
+          // setCorrectFlags([...correctFlags, inputFlag]);
+          // setSolvedChallenges(response.data.solved);
         } else {
           setAlertMessage(response.data.message);
           setAlertType("error");
