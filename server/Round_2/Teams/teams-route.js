@@ -147,7 +147,6 @@ router.get("/score",authMiddleware,async(req,res)=>{
         name:db_team.name,
         points:db_team.points,
         solved:db_team.solved_challenges.length,
-        score:db_team.points,
         machine_assigned:db_team.machine_assigned,
         total_flags:box.length
       })
