@@ -89,7 +89,7 @@ function Round2() {
             password : machinePassword
           }
         );
-        if (response.status === 200 && response.data.correct) {
+        if (response.status === 200) {
           setAlertMessage(response.data.message);
           setAlertType("success");
 
