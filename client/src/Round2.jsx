@@ -17,12 +17,31 @@ function Round2() {
   const [totalFlags, setTotalFlags] = useState(20);
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
   const [isUserButtonDisabled,setIsUserButtonDisabled] = useState(false);
+  const [isUserButtonDisabled,setIsUserButtonDisabled] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isUserSubmitting,setIsUserSubmitting] = useState(false);
   const [isUserSubmitting,setIsUserSubmitting] = useState(false);
   const [teamName, setTeamName] = useState("Your Team Name");
   // const [teamScore, setTeamScore] = useState(0);
   const [solvedChallenges, setSolvedChallenges] = useState(0);
   const [machineAssigned, setMachineAssigned] = useState("");
+  const [machinePassword,setMachinePassword] = useState("")
+  const [machineUsername,setMachineUsername] = useState("")
+  const [showUsers,setShowUsers] = useState([])
+
+  useEffect(()=>{
+    const fetchUsers = async() =>{
+      try{
+        const response = await axios.get(`${API_BASE_URL}/api/round_2/cred`);
+        setShowUsers(response.data.cred)
+        console.log(setShowUsers)
+        console.log(response.data.cred)
+      }catch(err){
+        console.log(err)
+      }
+    };
+    fetchUsers();
+  },[])
   const [machinePassword,setMachinePassword] = useState("")
   const [machineUsername,setMachineUsername] = useState("")
   const [showUsers,setShowUsers] = useState([])
@@ -299,6 +318,7 @@ function Round2() {
             </motion.div>
           </form>
           <form onSubmit={handleUserSubmit} className="p-3">
+          <form onSubmit={handleUserSubmit} className="p-3">
             <motion.div
               className="flex "
               variants={spanVariants}
@@ -312,11 +332,15 @@ function Round2() {
                 placeholder="Enter Username"
                 value={machineUsername}
                 onChange={(e) => setMachineUsername(e.target.value)}
+                value={machineUsername}
+                onChange={(e) => setMachineUsername(e.target.value)}
               />
               <input
                 type="text"
                 className="p-2 ml-2 text-black border-none focus:ring-hacker-green mb-4"
                 placeholder="Enter Password"
+                value={machinePassword}
+                onChange={(e) => setMachinePassword(e.target.value)}
                 value={machinePassword}
                 onChange={(e) => setMachinePassword(e.target.value)}
               />
@@ -331,12 +355,15 @@ function Round2() {
               <button
                 type="submit"
                 disabled={isUserButtonDisabled || isUserSubmitting}
+                disabled={isUserButtonDisabled || isUserSubmitting}
                 className={`ml-2 p-2 h-10 bg-hacker-green text-black font-bold ${
+                  isUserSubmitting || isUserButtonDisabled
                   isUserSubmitting || isUserButtonDisabled
                     ? "opacity-50 cursor-not-allowed"
                     : ""
                 }`}
               >
+                {isUserSubmitting ? "Please wait..." : "Submit"}
                 {isUserSubmitting ? "Please wait..." : "Submit"}
               </button>
             </motion.div>
