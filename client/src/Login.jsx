@@ -89,7 +89,7 @@ const Login = () => {
           }, 2000); // Wait for the alert message to show
         } else {
           setAlertMessage("Login successful! Redirecting to home...");
-          setTimeout(() => navigate('/'), 2000);
+          setTimeout(() => navigate('/home'), 2000);
         }
       }
     } catch (error) {
