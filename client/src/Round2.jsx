@@ -17,16 +17,16 @@ function Round2() {
   const [totalFlags, setTotalFlags] = useState(20);
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
   const [isUserButtonDisabled,setIsUserButtonDisabled] = useState(false);
-  const [isUserButtonDisabled,setIsUserButtonDisabled] = useState(false);
+  // const [isUserButtonDisabled,setIsUserButtonDisabled] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isUserSubmitting,setIsUserSubmitting] = useState(false);
-  const [isUserSubmitting,setIsUserSubmitting] = useState(false);
+  // const [isUserSubmitting,setIsUserSubmitting] = useState(false);
   const [teamName, setTeamName] = useState("Your Team Name");
   // const [teamScore, setTeamScore] = useState(0);
   const [solvedChallenges, setSolvedChallenges] = useState(0);
   const [machineAssigned, setMachineAssigned] = useState("");
   const [machinePassword,setMachinePassword] = useState("")
-  const [machineUsername,setMachineUsername] = useState("")
+  // const [machineUsername,setMachineUsername] = useState("")
   const [showUsers,setShowUsers] = useState([])
 
   useEffect(()=>{
