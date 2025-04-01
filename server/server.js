@@ -20,13 +20,16 @@ app.use(
 require("dotenv").config();
 
 require("./connection")();
-
+const logger=require("./server_logger");
 const PORT = process.env.PORT || 5500;
+const rateLimit = require("express-rate-limit");
+app.use(rateLimit)
+
 app.use("/auth", authRoute);
 app.use("/api/team", authMiddleware, teamRoute);
 app.use("/api/challenges", challengeRoute);
 app.use("/api/round_2",round_2_teamRoute);
 app.use("/api/round_2/challenges",round_2_challengeRoute);
 app.listen(PORT, () => {
-  console.log(`Server running at ${PORT}`);
+  logger.info(`Server is running on port ${PORT}`);
 }); 
